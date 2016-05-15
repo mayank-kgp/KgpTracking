@@ -1,17 +1,43 @@
 package com.example.mayank.kgptracking;
 
+import android.Manifest;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.location.ActivityRecognitionApi;
+import com.google.android.gms.location.DetectedActivity;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -28,9 +54,16 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
 
-public class MainActivity extends AppCompatActivity implements OnStreetViewPanoramaReadyCallback {
-    GoogleMap m_map;
-    boolean mapReady=false;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
+public class MainActivity extends AppCompatActivity implements
+        OnStreetViewPanoramaReadyCallback, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,LocationListener
+,ResultCallback<Status>{
+//    GoogleMap m_map;
+//    boolean mapReady=false;
 
 //    MarkerOptions renton;
 //
@@ -55,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements OnStreetViewPanor
 //            .build();
 
 
-
 //    static final CameraPosition DUBLIN = CameraPosition.builder()
 //            .target(new LatLng(53.3478,-6.2597))
 //            .zoom(17)
@@ -71,21 +103,33 @@ public class MainActivity extends AppCompatActivity implements OnStreetViewPanor
 //            .tilt(45)
 //            .build();
 
-    LatLng renton=new LatLng(47.489805, -122.120502);
-    LatLng kirkland=new LatLng(47.7301986, -122.1768858);
-    LatLng everett=new LatLng(47.978748,-122.202001);
-    LatLng lynnwood=new LatLng(47.819533,-122.32288);
-    LatLng montlake=new LatLng(47.7973733,-122.3281771);
-    LatLng kent=new LatLng(47.385938,-122.258212);
-    LatLng showare=new LatLng(47.38702,-122.23986);
-    static final CameraPosition SEATTLE = CameraPosition.builder()
-            .target(new LatLng(47.6204,-122.2491))
-            .zoom(10)
-            .bearing(0)
-            .tilt(45)
-            .build();
-    StreetViewPanorama panorama;
+//    LatLng renton=new LatLng(47.489805, -122.120502);
+//    LatLng kirkland=new LatLng(47.7301986, -122.1768858);
+//    LatLng everett=new LatLng(47.978748,-122.202001);
+//    LatLng lynnwood=new LatLng(47.819533,-122.32288);
+//    LatLng montlake=new LatLng(47.7973733,-122.3281771);
+//    LatLng kent=new LatLng(47.385938,-122.258212);
+//    LatLng showare=new LatLng(47.38702,-122.23986);
+//    static final CameraPosition SEATTLE = CameraPosition.builder()
+//            .target(new LatLng(47.6204,-122.2491))
+//            .zoom(10)
+//            .bearing(0)
+//            .tilt(45)
+//            .build();
+//    StreetViewPanorama panorama;
 
+    private final String LOG_TAG = "LaurenceTestApp";
+    private TextView txtOutput;
+    private TextView updatetime;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    protected Location mLastLocation;
+    protected TextView mLatitudeText;
+    protected TextView mLongitudeText;
+    private Button mRequestActivityUpdatesButton;
+    private Button mRemoveActivityUpdatesButton;
+  private TextView mStatusText;
+    protected ActivityDetectionBroadcastReceiver mBroadcastReciever;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -206,10 +250,31 @@ public class MainActivity extends AppCompatActivity implements OnStreetViewPanor
 //        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
 //        mapFragment.getMapAsync(this);
 
-        StreetViewPanoramaFragment streetViewPanoramaFragment =
-                (StreetViewPanoramaFragment) getFragmentManager()
-                        .findFragmentById(R.id.streetviewpanorama);
-        streetViewPanoramaFragment.getStreetViewPanoramaAsync(this);
+//        StreetViewPanoramaFragment streetViewPanoramaFragment =
+//                (StreetViewPanoramaFragment) getFragmentManager()
+//                        .findFragmentById(R.id.streetviewpanorama);
+//        streetViewPanoramaFragment.getStreetViewPanoramaAsync(this);
+        mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API)
+                .addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
+//        txtOutput = (TextView) findViewById(R.id.txtOutput);
+//        updatetime = (TextView) findViewById(R.id.updatetime);
+//        mLatitudeText = (TextView) findViewById((R.id.latitude_text));
+//        mLongitudeText = (TextView) findViewById((R.id.longitude_text));
+        mStatusText = (TextView) findViewById(R.id.detectedActivities);
+        mBroadcastReciever = new ActivityDetectionBroadcastReceiver();
+
+        mRequestActivityUpdatesButton = (Button) findViewById(R.id.request_activity_updates_button);
+        mRemoveActivityUpdatesButton = (Button) findViewById(R.id.remove_activity_updates_button);
+        buildGoogleApiClient();
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+           //     .addApi(LocationServices.API)
+                .addApi(ActivityRecognition.API)
+                .build();
     }
 
     @Override
@@ -281,11 +346,160 @@ public class MainActivity extends AppCompatActivity implements OnStreetViewPanor
 
     @Override
     public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
-        panorama = streetViewPanorama;
-        panorama.setPosition(new LatLng(36.0579667,-122.1430996));
-        StreetViewPanoramaCamera camera = new StreetViewPanoramaCamera.Builder()
-                .bearing(180)
-                .build();
-        panorama.animateTo(camera,10000);
+//        panorama = streetViewPanorama;
+//        panorama.setPosition(new LatLng(36.0579667,-122.1430996));
+//        StreetViewPanoramaCamera camera = new StreetViewPanoramaCamera.Builder()
+//                .bearing(180)
+//                .build();
+//        panorama.animateTo(camera,10000);
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+    }
+
+    @Override
+    protected void onStop() {
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReciever);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReciever,new IntentFilter(Constants.BROADCAST_ACTION));
+        super.onResume();
+    }
+
+    public void requestActivityUpdatesButtonHandeler(View view){
+        if(!mGoogleApiClient.isConnected()){
+            Toast.makeText(this,getString(R.string.not_connected),Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(mGoogleApiClient,
+                Constants.DETECTION_INTERVAL_IN_MILLISECONDS,getActivityDetectionPendingIntent()).setResultCallback(this);
+        mRequestActivityUpdatesButton.setEnabled(false);
+        mRemoveActivityUpdatesButton.setEnabled(true);
+    }
+    public void removeActivityUpdatesButtonHandeler(View view){
+        if(!mGoogleApiClient.isConnected()){
+            Toast.makeText(this,getString(R.string.not_connected),Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(mGoogleApiClient
+                ,getActivityDetectionPendingIntent()).setResultCallback(this);
+        mRequestActivityUpdatesButton.setEnabled(true);
+        mRemoveActivityUpdatesButton.setEnabled(false);
+    }
+
+    private PendingIntent getActivityDetectionPendingIntent(){
+        Intent intent = new Intent(this, DetectedActivitiesIntentService.class);
+        return PendingIntent.getService(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+//        mLocationRequest = LocationRequest.create();
+//        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        mLocationRequest.setInterval(7000);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+           //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+          // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+//        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, (LocationListener) this);
+//       mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+//        if (mLastLocation != null) {
+//            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+//            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+//        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i(LOG_TAG, "GoogleApiClient connection has been suspend");
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i(LOG_TAG, "GoogleApiClient connection has failed" + connectionResult.getErrorCode());
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.i(LOG_TAG, location.toString());
+        //txtOutput.setText(location.toString());
+        updatetime.setText(DateFormat.getTimeInstance().format(new Date()));
+        txtOutput.setText(String.valueOf(location.getLatitude()));
+    }
+
+    public String getActivityString(int detectedActivityType){
+        Resources resources = this.getResources();
+        switch (detectedActivityType){
+            case DetectedActivity.IN_VEHICLE:
+                return  resources.getString(R.string.in_vehicle);
+            case DetectedActivity.ON_BICYCLE:
+                return  resources.getString(R.string.on_bicycle);
+            case DetectedActivity.ON_FOOT:
+                return  resources.getString(R.string.on_foot);
+            case DetectedActivity.RUNNING:
+                return  resources.getString(R.string.running);
+            case DetectedActivity.STILL:
+                return  resources.getString(R.string.still);
+            case DetectedActivity.TILTING:
+                return  resources.getString(R.string.tilting);
+            case DetectedActivity.UNKNOWN:
+                return  resources.getString(R.string.unknown);
+            case DetectedActivity.WALKING:
+                return  resources.getString(R.string.walking);
+            default:
+                return  resources.getString(R.string.unidentifiable_activity);
+
+        }
+    }
+
+    @Override
+    public void onResult(@NonNull Status status) {
+        if(status.isSuccess()){
+            Log.e("mayank","Successfully added activity detection");
+        }
+        else {
+            Log.e("mayank","Error in adding or removing activity detection");
+        }
+    }
+
+    public class ActivityDetectionBroadcastReceiver extends BroadcastReceiver{
+        protected static final String TAG = "receiver";
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ArrayList<DetectedActivity> updateActivities = intent.getParcelableArrayListExtra(Constants.ACTIVITY_EXTRA);
+            String strStatus = "";
+            for (DetectedActivity thisActivity : updateActivities){
+                strStatus += getActivityString(thisActivity.getType())+thisActivity.getConfidence()+"%\n";
+
+            }
+            mStatusText.setText(strStatus);
+        }
+
+    }
+
 }
