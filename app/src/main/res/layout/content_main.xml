@@ -8,21 +8,21 @@
 
 
 
-    <!--<LinearLayout-->
-        <!--android:orientation="vertical"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="fill_parent"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentStart="true">-->
-        <!--<LinearLayout-->
-            <!--android:orientation="horizontal"-->
-            <!--android:layout_width="fill_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentBottom="true"-->
-            <!--android:layout_alignParentLeft="true"-->
-            <!--android:layout_alignParentStart="true"-->
-            <!--android:layout_marginTop="40dp">-->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="40dp">
 
 
             <!--&lt;!&ndash;<Button&ndash;&gt;-->
@@ -46,105 +46,105 @@
                 <!--&lt;!&ndash;android:id="@+id/btnHybrid"&ndash;&gt;-->
                 <!--&lt;!&ndash;android:layout_weight="1" />&ndash;&gt;-->
             <!--<Button-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="Seattle"-->
-                <!--android:id="@+id/btnSeattle"-->
-                <!--android:layout_weight="1" />-->
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Seattle"
+                android:id="@+id/btnSeattle"
+                android:layout_weight="1" />
 
-            <!--<Button-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="Tokyo"-->
-                <!--android:id="@+id/btnTokyo"-->
-                <!--android:layout_weight="1" />-->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tokyo"
+                android:id="@+id/btnTokyo"
+                android:layout_weight="1" />
 
-            <!--<Button-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="Dublin"-->
-                <!--android:id="@+id/btnDublin"-->
-                <!--android:layout_weight="1" />-->
-        <!--</LinearLayout>-->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dublin"
+                android:id="@+id/btnDublin"
+                android:layout_weight="1" />
+        </LinearLayout>
 
-        <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
-            <!--android:id="@+id/streetviewpanorama"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="fill_parent"-->
-            <!--android:name="com.google.android.gms.maps.StreetViewPanoramaFragment"/>-->
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/streetviewpanorama"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:name="com.google.android.gms.maps.StreetViewPanoramaFragment"/>
 
-    <!--</LinearLayout>-->
+    </LinearLayout>
 
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:textAppearance="?android:attr/textAppearanceLarge"-->
-        <!--android:text="Location goes here"-->
-        <!--android:id="@+id/txtOutput"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_marginTop="43dp" />-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Location goes here"
+        android:id="@+id/txtOutput"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="43dp" />
 
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:textAppearance="?android:attr/textAppearanceLarge"-->
-        <!--android:text="Time"-->
-        <!--android:id="@+id/updatetime"-->
-        <!--android:layout_marginTop="117dp"-->
-        <!--android:layout_below="@+id/txtOutput"-->
-        <!--android:layout_alignParentStart="true" />-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Time"
+        android:id="@+id/updatetime"
+        android:layout_marginTop="117dp"
+        android:layout_below="@+id/txtOutput"
+        android:layout_alignParentStart="true" />
 
 
-    <!--<LinearLayout-->
-        <!--android:orientation="vertical"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_marginTop="103dp">-->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="103dp">
 
-        <!--<TextView-->
-            <!--android:id="@+id/textView"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignBaseline="@+id/latitude_label"-->
-            <!--android:layout_marginLeft="10dp"-->
-            <!--android:layout_toRightOf="@+id/latitude_label"-->
-            <!--android:textIsSelectable="true"-->
-            <!--android:text="Latitude Goes Here"-->
-            <!--android:textSize="16sp" />-->
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/latitude_label"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/latitude_label"
+            android:textIsSelectable="true"
+            android:text="Latitude Goes Here"
+            android:textSize="16sp" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/latitude_text"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentLeft="true"-->
-            <!--android:layout_alignParentTop="true"-->
-            <!--android:text="Latitude:"-->
-            <!--android:textSize="16sp"-->
-            <!--android:layout_marginTop="0dp" />-->
+        <TextView
+            android:id="@+id/latitude_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Latitude:"
+            android:textSize="16sp"
+            android:layout_marginTop="0dp" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/textView3"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentLeft="true"-->
-            <!--android:layout_alignParentTop="true"-->
-            <!--android:text="Longitude:"-->
-            <!--android:layout_marginTop="24dp"-->
-            <!--android:textSize="16sp" />-->
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Longitude:"
+            android:layout_marginTop="24dp"
+            android:textSize="16sp" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/longitude_text"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignBaseline="@+id/longitude_label"-->
-            <!--android:layout_marginLeft="10dp"-->
-            <!--android:layout_toRightOf="@+id/longitude_label"-->
-            <!--android:textIsSelectable="true"-->
-            <!--android:layout_marginTop="24dp"-->
-            <!--android:text="Longitude Goes Here"-->
-            <!--android:textSize="16sp" />-->
-    <!--</LinearLayout>-->
+        <TextView
+            android:id="@+id/longitude_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/longitude_label"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/longitude_label"
+            android:textIsSelectable="true"
+            android:layout_marginTop="24dp"
+            android:text="Longitude Goes Here"
+            android:textSize="16sp" />
+    </LinearLayout>
 
 
     <Button

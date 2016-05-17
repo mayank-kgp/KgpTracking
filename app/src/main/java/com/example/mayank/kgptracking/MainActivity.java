@@ -386,14 +386,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void requestActivityUpdatesButtonHandeler(View view){
-        if(!mGoogleApiClient.isConnected()){
-            Toast.makeText(this,getString(R.string.not_connected),Toast.LENGTH_SHORT).show();
-            return;
-        }
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(mGoogleApiClient,
-                Constants.DETECTION_INTERVAL_IN_MILLISECONDS,getActivityDetectionPendingIntent()).setResultCallback(this);
-        mRequestActivityUpdatesButton.setEnabled(false);
-        mRemoveActivityUpdatesButton.setEnabled(true);
+        startActivity(new Intent(this,MainActivity.class));
+//        if(!mGoogleApiClient.isConnected()){
+//            Toast.makeText(this,getString(R.string.not_connected),Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(mGoogleApiClient,
+//                Constants.DETECTION_INTERVAL_IN_MILLISECONDS,getActivityDetectionPendingIntent()).setResultCallback(this);
+//        mRequestActivityUpdatesButton.setEnabled(false);
+//        mRemoveActivityUpdatesButton.setEnabled(true);
     }
     public void removeActivityUpdatesButtonHandeler(View view){
         if(!mGoogleApiClient.isConnected()){
