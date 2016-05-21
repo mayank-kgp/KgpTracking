@@ -75,9 +75,10 @@
                         android:orientation="horizontal"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:id="@+id/horizontalLinear"
                         android:background="#d7ccc8">
-
-                        <Button
+                        <!-- Added ID to this linear layout : Sahil  -->
+                        <!--<Button
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Bus 1"
@@ -140,7 +141,7 @@
                             android:text="BUS8"
                             android:id="@+id/bus8"
                             android:background="#ffffff"
-                            android:layout_marginRight="1dp" />
+                            android:layout_marginRight="1dp" />-->
                     </LinearLayout>
                 </HorizontalScrollView>
                 <TextView

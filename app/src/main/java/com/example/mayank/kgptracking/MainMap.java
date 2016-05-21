@@ -1,11 +1,17 @@
 package com.example.mayank.kgptracking;
+// added mBusCount,mActiveBus and mActivePolyline : Sahil
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -18,7 +24,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -37,87 +46,37 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class MainMap extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,LocationListener
-        ,ResultCallback<Status> {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, LocationListener
+        , ResultCallback<Status>, View.OnClickListener {
 
     TextView may;
-    GoogleMap m_map;
-    boolean mapReady=false;
-    MarkerOptions markbus1;
-    MarkerOptions markbus2;
-    MarkerOptions markbus3;
-    MarkerOptions markbus4;
-    MarkerOptions markbus5;
-    MarkerOptions markbus6;
-    MarkerOptions markbus7;
-    MarkerOptions markbus8;
-    Marker marker1;
-    Marker marker2;
-    Marker marker3;
-    Marker marker4;
-    Marker marker5;
-    Marker marker6;
-    Marker marker7;
-    Marker marker8;
-    Button bus1;
-    Button bus2;
-    Button bus3;
-    Button bus4;
-    Button bus5;
-    Button bus6;
-    Button bus7;
-    Button bus8;
-    ArrayList<LatLng> polylist1;
-    ArrayList<LatLng> polylist2;
-    ArrayList<LatLng> polylist3;
-    ArrayList<LatLng> polylist4;
-    ArrayList<LatLng> polylist5;
-    ArrayList<LatLng> polylist6;
-    ArrayList<LatLng> polylist7;
-    ArrayList<LatLng> polylist8;
-    PolylineOptions polylineOptions1;
-    PolylineOptions polylineOptions2;
-    PolylineOptions polylineOptions3;
-    PolylineOptions polylineOptions4;
-    PolylineOptions polylineOptions5;
-    PolylineOptions polylineOptions6;
-    PolylineOptions polylineOptions7;
-    PolylineOptions polylineOptions8;
-    Polyline polyline1;
-    Polyline polyline2;
-    Polyline polyline3;
-    Polyline polyline4;
-    Polyline polyline5;
-    Polyline polyline6;
-    Polyline polyline7;
-    Polyline polyline8;
+    public static int mBusCount = 0; // Sahil
+    public static Polyline mActivePolyline = null; // Sahil
+    public static Bus mActiveBus = null; // Sahil
+    public static GoogleMap m_map;
+    public static LatLng mUserLocation = null;
+    boolean mapReady = false;
+    CameraPosition currentloc;
 
-
-      CameraPosition currentloc;
-
-    LatLng latlngbus1;
-    LatLng latlngbus2;
-    LatLng latlngbus3;
-    LatLng latlngbus4;
-    LatLng latlngbus5;
-    LatLng latlngbus6;
-    LatLng latlngbus7;
-    LatLng latlngbus8;
 
     private final String LOG_TAG = "MayankApp";
 
-    private GoogleApiClient mGoogleApiClient;
 
     ScrollView mScrollView;
 
-    Polyline activepolyline;
-
-
-
+    ArrayList<Bus> mBuses = new ArrayList<Bus>();
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,41 +96,11 @@ public class MainMap extends AppCompatActivity
 //                        .setAction("Action", null).show();
 //            }
 //        });
-        latlngbus1 = new LatLng(22.3216277,87.3009507);
-        latlngbus2 = new LatLng(22.3087906,87.3040474);
-        latlngbus3 = new LatLng(22.3094332,87.3084944);
-        latlngbus4 = new LatLng(22.3177048,87.3070111);
-        latlngbus5 = new LatLng(22.3203539,87.3026035);
-        latlngbus6 = new LatLng(22.3169741,87.2936269);
-        latlngbus7 = new LatLng(22.3213312,87.2973794);
-        latlngbus8 = new LatLng(22.3199529,87.2973606);
-
-        polylist1 = new ArrayList<LatLng>();
-        polylist2 = new ArrayList<LatLng>();
-        polylist3 = new ArrayList<LatLng>();
-        polylist4 = new ArrayList<LatLng>();
-        polylist5 = new ArrayList<LatLng>();
-        polylist6 = new ArrayList<LatLng>();
-        polylist7 = new ArrayList<LatLng>();
-        polylist8 = new ArrayList<LatLng>();
-        polylineOptions1 = new PolylineOptions();
-        polylineOptions2 = new PolylineOptions();
-        polylineOptions3 = new PolylineOptions();
-        polylineOptions4 = new PolylineOptions();
-        polylineOptions5 = new PolylineOptions();
-        polylineOptions6 = new PolylineOptions();
-        polylineOptions7 = new PolylineOptions();
-        polylineOptions8 = new PolylineOptions();
-
-        polylist1.add(0,new LatLng(22.32199,87.3063487));
-        polylist1.add(1,new LatLng(22.3216885,87.3036128));
-        polylist1.add(2,new LatLng(22.3186439,87.2962743));
-        polylist2.add(0,new LatLng(22.3223386,87.3013665));
-        polylist2.add(1,new LatLng(22.3167259,87.3146313));
-        polylist1.add(2,new LatLng(22.3223634,87.3079043));
-
-        polylineOptions1.addAll(polylist1).geodesic(true);
-        polylineOptions2.addAll(polylist2);
+        Log.d(LOG_TAG, "" + mBusCount);
+        mBuses.add(new Bus(this, "RP-MS-LLR", "787270", "Bus1", 22.3216277, 87.3009507));
+        Log.d(LOG_TAG, "" + mBusCount);
+        mBuses.add(new Bus(this, "RP-MS-LLR-MMM-LBS", "7872", "Bus2", 22.3087906, 87.3040474));
+        Log.d(LOG_TAG, "" + mBusCount);
 
 
         if (m_map == null) {
@@ -191,202 +120,10 @@ public class MainMap extends AppCompatActivity
 
         }
 
-        bus1 = (Button) findViewById(R.id.bus1);
-        bus2 = (Button) findViewById(R.id.bus2);
-        bus3 = (Button) findViewById(R.id.bus3);
-        bus4 = (Button) findViewById(R.id.bus4);
-        bus5 = (Button) findViewById(R.id.bus5);
-        bus6 = (Button) findViewById(R.id.bus6);
-        bus7 = (Button) findViewById(R.id.bus7);
-        bus8 = (Button) findViewById(R.id.bus8);
 
-
-        if(mapReady) {
-            m_map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        if (mapReady) {
+            m_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         }
-
-        markbus1 = new MarkerOptions()
-                .position(latlngbus1)
-                .title("Renton")
-                .snippet("Bus1")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.location));
-        markbus2 = new MarkerOptions()
-                .position(latlngbus2)
-                .title("Renton")
-                .snippet("Bus2")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.location));
-        markbus3 = new MarkerOptions()
-                .position(latlngbus3)
-                .title("Renton")
-                .snippet("Bus3")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.location));
-        markbus4 = new MarkerOptions()
-                .position(latlngbus4)
-                .title("Renton")
-                .snippet("Bus4")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.location));
-        markbus5 = new MarkerOptions()
-                .position(latlngbus5)
-                .title("Renton")
-                .snippet("Bus5")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.location));
-        markbus6 = new MarkerOptions()
-                .position(latlngbus6)
-                .title("Renton")
-                .snippet("Bus6")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.location));
-        markbus7 = new MarkerOptions()
-                .position(latlngbus7)
-                .title("Renton")
-                .snippet("Bus7")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.location));
-        markbus8 = new MarkerOptions()
-                .position(latlngbus8)
-                .title("Renton")
-                .snippet("Bus8")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.location));
-
-        bus1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  bus1.setFocusable(true);
-                bus1.setBackgroundColor(Color.BLUE);
-
-                if(marker1.isInfoWindowShown()){
-                    marker1.hideInfoWindow();
-                }
-                else {
-                    marker1.showInfoWindow();
-                }
-                if(activepolyline!=null) {
-                    activepolyline.remove();
-                }
-            activepolyline =  m_map.addPolyline(polylineOptions1);
-
-
-            }
-        });
-        bus2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            //    bus2.setFocusable(true);
-                bus2.setBackgroundColor(Color.BLUE);
-
-                if(marker2.isInfoWindowShown()){
-                    marker2.hideInfoWindow();
-                }
-                else {
-                    marker2.showInfoWindow();
-                }
-                if(activepolyline!=null) {
-                    activepolyline.remove();
-                }
-                activepolyline =  m_map.addPolyline(polylineOptions2);
-
-            }
-        });
-        bus3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  bus3.setFocusable(true);
-                bus3.setBackgroundColor(Color.BLUE);
-
-                if(marker3.isInfoWindowShown()){
-                    marker3.hideInfoWindow();
-                }
-                else {
-                    marker3.showInfoWindow();
-                }
-                if(activepolyline!=null) {
-                    activepolyline.remove();
-                }
-                activepolyline =  m_map.addPolyline(polylineOptions3);
-            }
-        });
-        bus4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  bus4.setFocusable(true);
-
-                if(marker4.isInfoWindowShown()){
-                    marker4.hideInfoWindow();
-                }
-                else {
-                    marker4.showInfoWindow();
-                }
-                if(activepolyline!=null) {
-                    activepolyline.remove();
-                }
-                activepolyline =  m_map.addPolyline(polylineOptions4);
-            }
-        });
-        bus5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  bus5.setFocusable(true);
-
-                if(marker5.isInfoWindowShown()){
-                    marker5.hideInfoWindow();
-                }
-                else {
-                    marker5.showInfoWindow();
-                }
-                if(activepolyline!=null) {
-                    activepolyline.remove();
-                }
-                activepolyline =  m_map.addPolyline(polylineOptions5);
-            }
-        });
-        bus6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  bus6.setFocusable(true);
-                if(marker6.isInfoWindowShown()){
-                    marker6.hideInfoWindow();
-                }
-                else {
-                    marker6.showInfoWindow();
-                }
-                if(activepolyline!=null) {
-                    activepolyline.remove();
-                }
-                activepolyline =  m_map.addPolyline(polylineOptions6);
-            }
-        });
-        bus7.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  bus7.setFocusable(true);
-                if(marker7.isInfoWindowShown()){
-                    marker7.hideInfoWindow();
-                }
-                else {
-                    marker7.showInfoWindow();
-                }
-                if(activepolyline!=null) {
-                    activepolyline.remove();
-                }
-                activepolyline =  m_map.addPolyline(polylineOptions7);
-            }
-        });
-        bus8.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               // bus8.setFocusable(true);
-                if(marker7.isInfoWindowShown()){
-                    marker7.hideInfoWindow();
-                }
-                else {
-                    marker7.showInfoWindow();
-                }
-                if(activepolyline!=null) {
-                    activepolyline.remove();
-                }
-                activepolyline =  m_map.addPolyline(polylineOptions8);
-            }
-        });
-
-
 
         buildGoogleApiClient();
 
@@ -399,15 +136,20 @@ public class MainMap extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-           //     getFragmentManager().findFragmentById(R.id.map);
+        //     getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        client.connect();
     }
 
     protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        client = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                     .addApi(LocationServices.API)
+                .addApi(LocationServices.API)
                 //.addApi(ActivityRecognition.API)
                 .build();
     }
@@ -431,9 +173,7 @@ public class MainMap extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -471,12 +211,37 @@ public class MainMap extends AppCompatActivity
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Log.d(LOG_TAG,"Connected");
+        getUserLocation();
+    }
 
+    public LatLng getUserLocation() {
+        if (client.isConnected()) {
+            Log.d(LOG_TAG,"Connected getUserLocation");
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                mUserLocation = null;
+            }
+            Location location = (Location) LocationServices.FusedLocationApi.getLastLocation(client);
+            mUserLocation = new LatLng(location.getLatitude(), location.getLatitude());
+            Log.d(LOG_TAG,""+mUserLocation.latitude);
+            return mUserLocation;
+        } else {
+            Log.d(LOG_TAG,"Not connected");
+            return null;
+        }
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         Log.i(LOG_TAG, "GoogleApiClient connection has been suspend");
+        Toast.makeText(this, "GoogleApiClient connection has been suspend", Toast.LENGTH_LONG);
     }
 
     @Override
@@ -487,32 +252,136 @@ public class MainMap extends AppCompatActivity
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.i(LOG_TAG, "GoogleApiClient connection has failed" + connectionResult.getErrorCode());
+        Toast.makeText(this, "GoogleApiClient connection has been Failed", Toast.LENGTH_LONG);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d("mapreadyfunction","called");
-        mapReady=true;
+        mapReady = true;
         m_map = googleMap;
         currentloc = CameraPosition.builder()
-                .target(new LatLng(22.3216178,87.3009507))
+                .target(new LatLng(22.3216178, 87.3009507))
                 .zoom(17)
                 .bearing(0)
-             //   .tilt(45)
+                //   .tilt(45)
                 .build();
         m_map.moveCamera(CameraUpdateFactory.newCameraPosition(currentloc));
-    marker1 =  m_map.addMarker(markbus1);
-        marker2=     m_map.addMarker(markbus2);
-        marker3 = m_map.addMarker(markbus3);
-        marker4 =  m_map.addMarker(markbus4);
-        marker5 = m_map.addMarker(markbus5);
-        marker6 = m_map.addMarker(markbus6);
-        marker7 =  m_map.addMarker(markbus7);
-        marker8 = m_map.addMarker(markbus8);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+
+        }
+        m_map.setMyLocationEnabled(true);
+
+        m_map.getUiSettings().setMyLocationButtonEnabled(true);
+        Log.d("mapreadyfunction", mBusCount + "");
+        for (int i = 0; i < mBusCount; i++) {
+            Log.d("mapreadyfunction", "calledhere");
+            mBuses.get(i).setMarker(m_map.addMarker(mBuses.get(i).getMarkerOptions()));
+        }
+        m_map.setOnMyLocationChangeListener(myLocationChangeListener);
     }
 
     @Override
     public void onResult(@NonNull Status status) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        for (int i = 0; i < mBusCount; i++) {
+            if (v.getId() == i) {
+                if (mActiveBus == null)
+                    mBuses.get(i).setBusInFocus();
+                else if (mActiveBus.equals(mBuses.get(i))) {
+                    mActiveBus.setBusOutFocus();
+                } else {
+                    mActiveBus.setBusOutFocus();
+                    mBuses.get(i).setBusInFocus();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "MainMap Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.mayank.kgptracking/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "MainMap Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.mayank.kgptracking/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
+    private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+        @Override
+        public void onMyLocationChange(Location location) {
+            Log.d(LOG_TAG,"Location chagned called");
+            mUserLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        }
+    };
+    private class Test extends AsyncTask<Void,Void ,String>{
+        @Override
+        protected void onPostExecute(String result) {
+
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String response = "";
+            String url = "http://192.168.42.218/Testing/test.php";
+            {
+                HttpClient client = new HttpClient();
+                HttpGet httpGet = new HttpGet(url);
+                try {
+                    HttpResponse execute = client.execute(httpGet);
+                    InputStream content = execute.getEntity().getContent();
+
+                    BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
+                    String s = "";
+                    while ((s = buffer.readLine()) != null) {
+                        response += s;
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return response;
+        }
     }
 }
