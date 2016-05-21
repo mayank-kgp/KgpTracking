@@ -151,11 +151,13 @@ public class Bus implements RoutingListener {
         polyOptions.color(mContext.getResources().getColor(R.color.blue));
         polyOptions.width(10);
         polyOptions.addAll(routes.get(shortestRouteIndex).getPoints());
-        if(MainMap.mActivePolyline != null){
+        if(MainMap.mActivePolyline != null){ // remove Current Active Polyline everytime before addin g new active Polyline
             MainMap.mActivePolyline.remove();
             MainMap.mActivePolyline = null;
         }
-        MainMap.mActivePolyline = MainMap.m_map.addPolyline(polyOptions);
+        if(MainMap.mActiveBus.equals(this)) {  // Check if Active Bus right now is equal to the original Bus Where this callback is called
+            MainMap.mActivePolyline = MainMap.m_map.addPolyline(polyOptions);
+        }
     }
     @Override
     public void onRoutingFailure(RouteException e) {
