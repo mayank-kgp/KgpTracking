@@ -2,6 +2,9 @@ package com.example.mayank.kgptracking;
 // added mBusCount,mActiveBus and mActivePolyline : Sahil
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -26,6 +29,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
@@ -46,9 +53,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class MainMap extends AppCompatActivity
@@ -65,17 +77,13 @@ public class MainMap extends AppCompatActivity
     boolean mapReady = false;
     CameraPosition currentloc;
 
-
     private final String LOG_TAG = "MayankApp";
 
 
     ScrollView mScrollView;
 
     ArrayList<Bus> mBuses = new ArrayList<Bus>();
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
+
     private GoogleApiClient client;
 
     @Override
@@ -84,7 +92,7 @@ public class MainMap extends AppCompatActivity
         setContentView(R.layout.activity_main_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //getIntent().getStringExtra()
         may = (TextView) findViewById(R.id.may);
         may.setSelected(true);
 
@@ -104,7 +112,7 @@ public class MainMap extends AppCompatActivity
 
 
         if (m_map == null) {
-            m_map = ((CustomMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+             m_map = ((CustomMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             m_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             m_map.getUiSettings().setZoomControlsEnabled(true);
             mScrollView = (ScrollView) findViewById(R.id.scrollView);
@@ -212,10 +220,10 @@ public class MainMap extends AppCompatActivity
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(LOG_TAG,"Connected");
-        getUserLocation();
+      /*  getUserLocation();*/
     }
 
-    public LatLng getUserLocation() {
+   /* public LatLng getUserLocation() {
         if (client.isConnected()) {
             Log.d(LOG_TAG,"Connected getUserLocation");
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -228,7 +236,7 @@ public class MainMap extends AppCompatActivity
                 // for ActivityCompat#requestPermissions for more details.
                 mUserLocation = null;
             }
-            Location location = (Location) LocationServices.FusedLocationApi.getLastLocation(client);
+            Location location = LocationServices.FusedLocationApi.getLastLocation(client);
             mUserLocation = new LatLng(location.getLatitude(), location.getLatitude());
             Log.d(LOG_TAG,""+mUserLocation.latitude);
             return mUserLocation;
@@ -237,7 +245,7 @@ public class MainMap extends AppCompatActivity
             return null;
         }
     }
-
+*/
     @Override
     public void onConnectionSuspended(int i) {
         Log.i(LOG_TAG, "GoogleApiClient connection has been suspend");
@@ -296,11 +304,14 @@ public class MainMap extends AppCompatActivity
     public void onClick(View v) {
         for (int i = 0; i < mBusCount; i++) {
             if (v.getId() == i) {
+               /* Test test = new Test();
+                test.execute();*/
                 if (mActiveBus == null)
                     mBuses.get(i).setBusInFocus();
                 else if (mActiveBus.equals(mBuses.get(i))) {
                     mActiveBus.setBusOutFocus();
-                } else {
+                }
+                else {
                     mActiveBus.setBusOutFocus();
                     mBuses.get(i).setBusInFocus();
                 }
@@ -354,7 +365,33 @@ public class MainMap extends AppCompatActivity
             mUserLocation = new LatLng(location.getLatitude(), location.getLongitude());
         }
     };
-    private class Test extends AsyncTask<Void,Void ,String>{
+    private class Reciever extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+        }
+    }
+
+   /* String URL = "http://192.168.42.218/Testing/test.php";
+    JsonObjectRequest jsObjRequest = new JsonObjectRequest
+            (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // TODO Auto-generated method stub
+                }
+            });
+
+    private void makeToast(JSONObject response) {
+        Toast.makeText(this,"Response: " + response.toString(),Toast.LENGTH_LONG);
+    }*/
+    /*private class Test extends AsyncTask<Void,Void ,String>{
         @Override
         protected void onPostExecute(String result) {
 
@@ -383,5 +420,73 @@ public class MainMap extends AppCompatActivity
             }
             return response;
         }
-    }
+    }*/
+
+    /*private class Test extends AsyncTask<Void,Void ,String>{
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(LOG_TAG,result);
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // Will contain the raw JSON response as a string.
+            String response = null;
+
+            try {
+                // Construct the URL for the OpenWeatherMap query
+                // Possible parameters are avaiable at OWM's forecast API page, at
+                // http://openweathermap.org/API#forecast
+                URL url = new URL(*//*"http://192.168.42.218/Testing/test.php"*//*"http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
+
+                // Create the request to OpenWeatherMap, and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return null;
+                }
+                response = buffer.toString();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error ", e);
+                // If the code didn't successfully get the weather data, there's no point in attemping
+                // to parse it.
+                return null;
+            } finally{
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream", e);
+                    }
+                }
+            }
+          return response;
+        }
+    }*/
 }

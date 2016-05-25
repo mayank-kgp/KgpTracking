@@ -102,10 +102,6 @@ public class Bus implements RoutingListener {
             mMarker.showInfoWindow();
             MainMap.mActiveBus = this;
             mActive = true;
-            if(MainMap.mActivePolyline != null){
-                MainMap.mActivePolyline.remove();
-                MainMap.mActivePolyline = null;
-            }
             if(MainMap.mUserLocation != null)
             findRouteFromPosition(MainMap.mUserLocation.latitude ,MainMap.mUserLocation.longitude);
             else{
@@ -157,6 +153,9 @@ public class Bus implements RoutingListener {
         }
         if(MainMap.mActiveBus.equals(this)) {  // Check if Active Bus right now is equal to the original Bus Where this callback is called
             MainMap.mActivePolyline = MainMap.m_map.addPolyline(polyOptions);
+        }
+        else if(MainMap.mActiveBus != null){
+            MainMap.mActiveBus.setBusInFocus();
         }
     }
     @Override
