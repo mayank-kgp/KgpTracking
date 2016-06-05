@@ -34,10 +34,12 @@ public class Bus implements RoutingListener {
     private Marker mMarker;
     private MarkerOptions mMarkerOptions;
     private Context mContext;
+    private String mBusCode;
     private boolean mActive = false;
-    public Bus(Context context,String busRoute,String busNumber,String busName,Double Lat, Double Lng){
+    public Bus(Context context,String busRoute,String buscode,String busNumber,String busName,Double Lat, Double Lng){
         mLat = Lat;
         mLng = Lng;
+        mBusCode = buscode;
         mLocation = new LatLng(mLat,mLng);
         mBusName = busName;
         mBusNumber = busNumber;
@@ -151,7 +153,7 @@ public class Bus implements RoutingListener {
             MainMap.mActivePolyline.remove();
             MainMap.mActivePolyline = null;
         }
-        if(MainMap.mActiveBus.equals(this)) {  // Check if Active Bus right now is equal to the original Bus Where this callback is called
+        if(this.equals(MainMap.mActiveBus)) {  // Check if Active Bus right now is equal to the original Bus Where this callback is called
             MainMap.mActivePolyline = MainMap.m_map.addPolyline(polyOptions);
         }
         else if(MainMap.mActiveBus != null){

@@ -53,15 +53,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import static java.lang.Double.parseDouble;
 
 public class MainMap extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -88,11 +86,38 @@ public class MainMap extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(Constants.LOG_TAG,"onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //getIntent().getStringExtra()
+        HashMap<String,String> data;
+        data = (HashMap<String,String>) getIntent().getSerializableExtra("DATA");
+        JSONArray Busdata = null;
+        JSONArray Trackdata = null;
+        try {
+            Busdata = new JSONArray(data.get("Busdata"));
+            Trackdata = new JSONArray(data.get("Trackdata"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        for(int i  = 0; i< Busdata.length() ;i++){
+            try {
+                JSONObject bus = Busdata.getJSONObject(i);
+                JSONObject track = Trackdata.getJSONObject(i);
+                mBuses.add(new Bus(this,bus.getString(Constants.RESPONSE_BUSROUTE),
+                        bus.getString(Constants.RESPONSE_BUSCODE),bus.getString(Constants.RESPONSE_BUSNUMBER),
+                        bus.getString(Constants.RESPONSE_BUSNAME),
+                        parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LAT)),
+                        parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LON))
+                ));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
         may = (TextView) findViewById(R.id.may);
         may.setSelected(true);
 
@@ -104,13 +129,6 @@ public class MainMap extends AppCompatActivity
 //                        .setAction("Action", null).show();
 //            }
 //        });
-        Log.d(LOG_TAG, "" + mBusCount);
-        mBuses.add(new Bus(this, "RP-MS-LLR", "787270", "Bus1", 22.3216277, 87.3009507));
-        Log.d(LOG_TAG, "" + mBusCount);
-        mBuses.add(new Bus(this, "RP-MS-LLR-MMM-LBS", "7872", "Bus2", 22.3087906, 87.3040474));
-        Log.d(LOG_TAG, "" + mBusCount);
-
-
         if (m_map == null) {
              m_map = ((CustomMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             m_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -365,128 +383,15 @@ public class MainMap extends AppCompatActivity
             mUserLocation = new LatLng(location.getLatitude(), location.getLongitude());
         }
     };
-    private class Reciever extends BroadcastReceiver{
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-        }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Log.d(Constants.LOG_TAG,"onDestroy");
+        mBusCount = 0;
+        mActivePolyline = null; // Sahil
+        mActiveBus = null; // Sahil
+        mUserLocation = null;
+        mBuses = null;
+        m_map = null;
     }
-
-   /* String URL = "http://192.168.42.218/Testing/test.php";
-    JsonObjectRequest jsObjRequest = new JsonObjectRequest
-            (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
-
-                @Override
-                public void onResponse(JSONObject response) {
-                }
-            }, new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    // TODO Auto-generated method stub
-                }
-            });
-
-    private void makeToast(JSONObject response) {
-        Toast.makeText(this,"Response: " + response.toString(),Toast.LENGTH_LONG);
-    }*/
-    /*private class Test extends AsyncTask<Void,Void ,String>{
-        @Override
-        protected void onPostExecute(String result) {
-
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            String response = "";
-            String url = "http://192.168.42.218/Testing/test.php";
-            {
-                HttpClient client = new HttpClient();
-                HttpGet httpGet = new HttpGet(url);
-                try {
-                    HttpResponse execute = client.execute(httpGet);
-                    InputStream content = execute.getEntity().getContent();
-
-                    BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                    String s = "";
-                    while ((s = buffer.readLine()) != null) {
-                        response += s;
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            return response;
-        }
-    }*/
-
-    /*private class Test extends AsyncTask<Void,Void ,String>{
-        @Override
-        protected void onPostExecute(String result) {
-            Log.d(LOG_TAG,result);
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            // Will contain the raw JSON response as a string.
-            String response = null;
-
-            try {
-                // Construct the URL for the OpenWeatherMap query
-                // Possible parameters are avaiable at OWM's forecast API page, at
-                // http://openweathermap.org/API#forecast
-                URL url = new URL(*//*"http://192.168.42.218/Testing/test.php"*//*"http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
-
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                response = buffer.toString();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
-                return null;
-            } finally{
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
-                }
-            }
-          return response;
-        }
-    }*/
 }
