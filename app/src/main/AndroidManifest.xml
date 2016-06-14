@@ -78,6 +78,12 @@
 
         <activity android:name=".Login">
 
+            <receiver
+                android:name=".MyAlarmReceiver"
+                android:process=":remote" >
+            </receiver>
+
+
 
         </activity>
     </application>
