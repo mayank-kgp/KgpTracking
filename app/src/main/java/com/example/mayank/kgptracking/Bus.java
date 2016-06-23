@@ -10,15 +10,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.directions.route.AbstractRouting;
 import com.directions.route.Route;
 import com.directions.route.RouteException;
 import com.directions.route.Routing;
 import com.directions.route.RoutingListener;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
@@ -48,19 +48,47 @@ public class Bus implements RoutingListener {
         //LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rootView = ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
         //View rootView = super.findViewById(android.R.id.content);
-        LinearLayout lv = (LinearLayout) rootView.findViewById(R.id.horizontalLinear);
+        LinearLayout hv = (LinearLayout) rootView.findViewById(R.id.horizontalLinear);
+       // HorizontalScrollView hv = (HorizontalScrollView) rootView.findViewById(R.id.horizontalScrollView);
+
 
         Button bv = new Button(context);
+        Button bv1 = new Button(context);
         bv.setText(mBusName);
+        bv1.setText("mayank");
        // String bus_id = "Bus_"+(mBusCount+1);
         bv.setId(MainMap.mBusCount);
         bv.setBackgroundColor(Color.WHITE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             bv.setTextAppearance(R.style.BusButton);
         }
-        lv.addView(bv);
+
+
+        hv.addView(bv);
+        hv.addView(bv1);
+     //   lv.setMinimumWidth(200);
+      //  lv.setWeightSum(1.0f);
+
+       // lv.setWeightSum(lv.getChildCount()+1);
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        for (int i=0; i < hv.getChildCount(); i++){
+            Log.d("mayank2","i"+i);
+            View v = hv.getChildAt(i);
+//            LinearLayout.LayoutParams loparams = (LinearLayout.LayoutParams)  v.getLayoutParams();
+//
+//            // Set only target params:
+//            loparams.height = 0;
+         //   param.width = lv.getWidth();
+           // param.weight = 1;
+         //   param.width = 0;
+            v.setLayoutParams(param);
+           //Log.d("mayank2",""+v.getWidth());
+        //    Log.d("mayank2",""+lv.getWeightSum());
+        }
         //((Activity)context
-        //((Activity)context).setContentView(rootView);
+//        ((Activity)context).setContentView(rootView);
         mBusButton = bv;
         mBusButton.setOnClickListener((View.OnClickListener) context); // Ask Mayank set onClickListener to the context of MainMap
         mMarkerOptions = new MarkerOptions()

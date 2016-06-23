@@ -101,7 +101,7 @@ public class MainMap extends AppCompatActivity
                 mBuses.add(new Bus(this,bus.getString(Constants.RESPONSE_BUSROUTE),
                         bus.getString(Constants.RESPONSE_BUSCODE),bus.getString(Constants.RESPONSE_BUSNUMBER),
                         bus.getString(Constants.RESPONSE_BUSNAME),
-                        parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LAT)),
+                        parseDouble (track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LAT)),
                         parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LON))
                 ));
             } catch (JSONException e) {
@@ -218,6 +218,9 @@ public class MainMap extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        if(id == R.id.action_logout){
+            getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE).edit().clear().apply();
+        }
 
 //        if (id == R.id.nav_camera) {
 //            // Handle the camera action
