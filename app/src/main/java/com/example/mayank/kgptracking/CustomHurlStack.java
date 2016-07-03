@@ -29,8 +29,8 @@ public class CustomHurlStack extends HurlStack {
             connection.setRequestProperty("Authorization",/*Constants.ACCESS_TOKEN*/preferences.getString(Constants.TOKEN_TYPE,"")
             +" "+preferences.getString(Constants.ACCESS_TOKEN,"")
             );
-            Log.d("MyIntentService",preferences.getString(Constants.TOKEN_TYPE,"")
-                    +" "+preferences.getString(Constants.ACCESS_TOKEN,""));
+           // Log.d("MyIntentService",preferences.getString(Constants.TOKEN_TYPE,"")
+              //      +" "+preferences.getString(Constants.ACCESS_TOKEN,""));
             return connection;
     }
 }

@@ -31,4 +31,16 @@
         android:textSize="30sp"
         android:textStyle="bold"
         android:fontFamily="san-serif-thin" />
+
+    <com.wang.avi.AVLoadingIndicatorView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/loading"
+        android:visibility="visible"
+        app:indicator="BallPulse"
+        app:indicator_color="#ffffff"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="65dp" />
 </RelativeLayout>

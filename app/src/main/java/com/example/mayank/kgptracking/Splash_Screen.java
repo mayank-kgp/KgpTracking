@@ -1,101 +1,160 @@
 package com.example.mayank.kgptracking;
 
+import android.app.ActionBar;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
 import android.widget.RelativeLayout;
 
 public class Splash_Screen extends AppCompatActivity {
+
+    boolean gps = false;
     private Receiver mReceive = new Receiver(this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash__screen);
-        final boolean[] isConnected = {Util.checkConnection(Splash_Screen.this)};
-        if (isConnected[0]) {
-            Thread timerThread = new Thread() {
-                public void run() {
-                    try {
-                        //ParseUser user= ParseUser.getCurrentUser();
 
-                        sleep(3000);
+        ActionBar actionBar = getActionBar();
 
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } finally {
-
-
-                        SharedPreferences preferences = getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE);
-                        if (preferences.contains(Constants.isLogin) && preferences.getBoolean(Constants.isLogin, false)) {
-                            MyIntentService.startGetBusData(Splash_Screen.this);
-                            MyIntentService.startGetTrackData(Splash_Screen.this);
-                            IntentFilter filter = new IntentFilter();
-                            filter.addAction(MyIntentService.ACTION_GETBUSDATA);
-                            filter.addAction(MyIntentService.ACTION_GETTRACKDATA);
-                            LocalBroadcastManager.getInstance(Splash_Screen.this).
-                                    registerReceiver(mReceive, filter);
-                        } else {
-                            Intent i = new Intent(Splash_Screen.this, Login.class);
-                            startActivity(i);
-                            finish();
-                        }
-                    }
-
-                }
-            };
-            timerThread.start();
-        } else {
-
-            RelativeLayout coordinatorLayout = (RelativeLayout) findViewById(R.id
-                    .coordinatorLayout);
-            Snackbar snackbar = Snackbar
-                    .make(coordinatorLayout, "No Network", Snackbar.LENGTH_INDEFINITE);
-
-
-            snackbar.show();
-
-            Thread timerThread = new Thread() {
-                public void run() {
-                    try {
-                        //ParseUser user= ParseUser.getCurrentUser();
-                        while (isConnected[0] == false) {
-                            sleep(1000);
-                            if (Util.checkConnection(Splash_Screen.this) == true)
-                                isConnected[0] = true;
-
-                        }
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } finally {
-
-
-                        SharedPreferences preferences = getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE);
-                        if (preferences.contains(Constants.isLogin) && preferences.getBoolean(Constants.isLogin, false)) {
-                            MyIntentService.startGetBusData(Splash_Screen.this);
-                            MyIntentService.startGetTrackData(Splash_Screen.this);
-                            IntentFilter filter = new IntentFilter();
-                            filter.addAction(MyIntentService.ACTION_GETBUSDATA);
-                            filter.addAction(MyIntentService.ACTION_GETTRACKDATA);
-                            LocalBroadcastManager.getInstance(Splash_Screen.this).
-                                    registerReceiver(mReceive, filter);
-                        } else {
-                            Intent i = new Intent(Splash_Screen.this, Login.class);
-                            startActivity(i);
-                            finish();
-                        }
-                    }
-                }
-            };
-            timerThread.start();
-
+        if (actionBar != null) {
+            actionBar.hide();
         }
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+    }
+
+    @Override
+    protected void onResume() {
+        gpscheck();
+        Log.d("mayank123",""+gps);
+        if(gps) {
+            findViewById(R.id.loading).setVisibility(View.VISIBLE);
+            final boolean[] isConnected = {Util.checkConnection(Splash_Screen.this)};
+            if (isConnected[0]) {
+                Thread timerThread = new Thread() {
+                    public void run() {
+                        try {
+                            //ParseUser user= ParseUser.getCurrentUser();
+
+                            sleep(3000);
+
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } finally {
+
+
+                            SharedPreferences preferences = getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE);
+                            if (preferences.contains(Constants.isLogin) && preferences.getBoolean(Constants.isLogin, false)) {
+                                MyIntentService.startGetBusData(Splash_Screen.this);
+                                MyIntentService.startGetTrackData(Splash_Screen.this);
+                                IntentFilter filter = new IntentFilter();
+                                filter.addAction(MyIntentService.ACTION_GETBUSDATA);
+                                filter.addAction(MyIntentService.ACTION_GETTRACKDATA);
+                                LocalBroadcastManager.getInstance(Splash_Screen.this).
+                                        registerReceiver(mReceive, filter);
+                            } else {
+                                Intent i = new Intent(Splash_Screen.this, Login.class);
+                                startActivity(i);
+                                finish();
+                            }
+                        }
+
+                    }
+                };
+                timerThread.start();
+            } else {
+
+                RelativeLayout coordinatorLayout = (RelativeLayout) findViewById(R.id
+                        .coordinatorLayout);
+                Snackbar snackbar = Snackbar
+                        .make(coordinatorLayout, "No Network", Snackbar.LENGTH_INDEFINITE);
+
+
+                snackbar.show();
+
+                Thread timerThread = new Thread() {
+                    public void run() {
+                        try {
+                            //ParseUser user= ParseUser.getCurrentUser();
+                            while (isConnected[0] == false) {
+                                sleep(1000);
+                                if (Util.checkConnection(Splash_Screen.this) == true)
+                                    isConnected[0] = true;
+
+                            }
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } finally {
+
+
+                            SharedPreferences preferences = getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE);
+                            if (preferences.contains(Constants.isLogin) && preferences.getBoolean(Constants.isLogin, false)) {
+                                MyIntentService.startGetBusData(Splash_Screen.this);
+                                MyIntentService.startGetTrackData(Splash_Screen.this);
+                                IntentFilter filter = new IntentFilter();
+                                filter.addAction(MyIntentService.ACTION_GETBUSDATA);
+                                filter.addAction(MyIntentService.ACTION_GETTRACKDATA);
+                                LocalBroadcastManager.getInstance(Splash_Screen.this).
+                                        registerReceiver(mReceive, filter);
+                            } else {
+                                Intent i = new Intent(Splash_Screen.this, Login.class);
+                                startActivity(i);
+                                finish();
+                            }
+                        }
+                    }
+                };
+                timerThread.start();
+
+            }
+        }
+        super.onResume();
+    }
+
+
+
+    private void gpscheck(){
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            buildAlertMessageNoGps();
+        }
+        else{
+            gps = true;
+        }
+
+    }
+
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        builder.show();
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
             @Override

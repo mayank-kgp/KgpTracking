@@ -36,17 +36,19 @@
                 map:cameraTargetLng="-73.9857"
                 map:cameraTilt="65"
                 map:cameraZoom="17"
-                android:layout_weight="10"
-                android:layout_marginBottom="10dp" />
+                android:layout_marginBottom="10dp"
+                tools:layout="@layout/content_main_map"
+                android:layout_weight="8" />
 
 
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#e5f36b">
-                <TextView
+                android:layout_height="0dp"
+                android:background="#fff"
+                android:layout_weight="2">
+                <!--<TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
@@ -61,7 +63,7 @@
                     android:gravity="center"
                     android:textStyle="bold"
                     android:textSize="15dp"
-                    android:layout_marginBottom="5dp" />
+                    android:layout_marginBottom="5dp" />-->
                 <!--<HorizontalScrollView-->
                     <!--android:layout_width="match_parent"-->
                     <!--android:layout_height="0dp"-->
@@ -78,15 +80,8 @@
                         android:id="@+id/horizontalLinear"
                         android:background="#d7ccc8">
                         <!-- Added ID to this linear layout : Sahil  -->
-                        <!--<Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Bus 1"
-                            android:id="@+id/bus1"
-                            android:layout_marginRight="1dp"
-                            android:background="@drawable/abc_cab_background_internal_bg" />
 
-                        <Button
+                        <!--<Button
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="BUS2"
@@ -142,10 +137,9 @@
                             android:id="@+id/bus8"
                             android:background="#ffffff"
                             android:layout_marginRight="1dp" />-->
-
                     </LinearLayout>
                 <!--</HorizontalScrollView>-->
-                <TextView
+                <!--<TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
@@ -159,7 +153,7 @@
                     android:singleLine="true"
                     android:gravity="center"
                     android:textStyle="bold"
-                    android:textSize="15dp" />
+                    android:textSize="15dp" />-->
 
 
             </LinearLayout>

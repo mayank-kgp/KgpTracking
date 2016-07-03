@@ -80,16 +80,11 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".Login">
-
-            <receiver
-                android:name=".MyAlarmReceiver"
-                android:process=":remote" >
-            </receiver>
-
-
-
-        </activity>
+        <activity android:name=".Login"> </activity>
+        <receiver
+            android:name=".MyAlarmReceiver"
+            android:process=":remote" >
+        </receiver>
     </application>
 
 </manifest>

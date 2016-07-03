@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="250dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@android:color/white"-->
+        <!--android:orientation="vertical">-->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Bus Name"
+        android:id="@+id/busName"
+        android:layout_weight="1"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:textSize="15dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Route"
+        android:id="@+id/route"
+        android:layout_weight="1"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#616161"
+        android:textSize="15dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Bus Number"
+        android:id="@+id/busNumber"
+        android:layout_weight="1"
+        android:textStyle="italic"
+        android:textSize="15dp"
+        android:textColor="#616161" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Bus Distance"
+        android:id="@+id/busDistance"
+        android:layout_weight="1"
+        android:textStyle="italic"
+        android:textSize="15dp"
+        android:textIsSelectable="true"
+        android:textColor="#616161" />
+
+        <!--</LinearLayout>-->
+</LinearLayout>

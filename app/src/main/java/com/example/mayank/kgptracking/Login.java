@@ -2,15 +2,12 @@ package com.example.mayank.kgptracking;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -24,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 
@@ -39,8 +37,8 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
     private static final String TAG = "login Check";
     private LoginReceiver mReceiver = new LoginReceiver();
     private Receiver mBroadcastReceiver = new Receiver(this);
-    boolean gps_enable = false;
-
+    SignInButton  signInButton;
+    GoogleSignInOptions gso;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +47,7 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
         setSupportActionBar(toolbar);
        */ // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        signInButton = (SignInButton) findViewById(R.id.sign_in_button);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -58,6 +57,14 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
                 .requestScopes(new Scope(Scopes.PLUS_LOGIN))
                 .requestIdToken(getString(R.string.server_client_id))
                 .build();
+
+        if (signInButton != null) {
+            signInButton.setSize(SignInButton.SIZE_WIDE);
+           // signInButton.setColorScheme(SignInButton.COLOR_DARK);
+            signInButton.setScopes(gso.getScopeArray());
+        }
+
+
         // Build a GoogleApiClient with access to the Google Sign-In API and the
 // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -77,46 +84,11 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
     }
 
     @Override
-    protected void onResume() {
-        gpscheck();
-        super.onResume();
-    }
-
-    private void gpscheck(){
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            buildAlertMessageNoGps();
-        }
-    }
-
-
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        builder.show();
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    @Override
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         super.onDestroy();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -180,6 +152,7 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
         mGoogleApiClient.clearDefaultAccountAndReconnect();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
+    
     private class LoginReceiver extends BroadcastReceiver{
 
         @Override

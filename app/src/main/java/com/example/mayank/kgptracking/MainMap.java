@@ -2,10 +2,11 @@ package com.example.mayank.kgptracking;
 // added mBusCount,mActiveBus and mActivePolyline : Sahil
 
 import android.Manifest;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,10 +25,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
@@ -41,6 +45,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 
 import org.json.JSONArray;
@@ -74,6 +79,16 @@ public class MainMap extends AppCompatActivity
     ArrayList<Bus> mBuses = new ArrayList<Bus>();
 
     private GoogleApiClient client;
+    private Receiver receive;
+    NavigationView navigationView;
+
+    private HashMap<Marker, MyMarker> mMarkersHashMap;
+    private ArrayList<MyMarker> mMyMarkersArray;
+    public static LatLng mBusStop = null;
+    public static String mLoc = null; // user location got from Bus Stop
+    public static Marker mBusStopMarker = null;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +98,10 @@ public class MainMap extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //getIntent().getStringExtra()
+
+        mMarkersHashMap = new HashMap<Marker, MyMarker>();
+        mMyMarkersArray = new ArrayList<MyMarker>();
+
         HashMap<String,String> data;
         data = (HashMap<String,String>) getIntent().getSerializableExtra("DATA");
         JSONArray Busdata = null;
@@ -109,8 +128,8 @@ public class MainMap extends AppCompatActivity
             }
 
         }
-        may = (TextView) findViewById(R.id.may);
-        may.setSelected(true);
+//        may = (TextView) findViewById(R.id.may);
+//        may.setSelected(true);
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -155,23 +174,50 @@ public class MainMap extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         //     getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        View v = navigationView.inflateHeaderView(R.layout.nav_header_main_map);
+        SharedPreferences prefs = getSharedPreferences(Constants.LOGIN_FILE,Context.MODE_PRIVATE);
+        String username = prefs.getString(Constants.USERNAME, null);
+        String useremail = prefs.getString(Constants.EMAIL, null);
+        String picurl = prefs.getString(Constants.PIC_URL, null);
+        Log.d("mayank123",username);
+        if(username!=null){
+            TextView usernametext =  (TextView) v.findViewById(R.id.username);
+            if (usernametext != null) {
+                usernametext.setText(username);
+            }
+            else{
+                Log.d("mayank123","null1");
+            }
+        }
+        if(useremail!=null){
+            TextView useremailtext =  (TextView) v.findViewById(R.id.useremail);
+            if (useremailtext != null) {
+                useremailtext.setText(useremail);
+            }
+            else{
+                Log.d("mayank123","null1");
+            }
+        }
+        if(picurl!=null){
+            ImageView userimage =  (ImageView) v.findViewById(R.id.imageuser);
+            if (userimage != null) {
+                Glide.with(this).load(picurl).into(userimage);
+            }
+            else{
+                Log.d("mayank123","null1");
+            }
+        }
+        View navheaderView = navigationView.getHeaderView(0);
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         client.connect();
-
-        scheduleAlarm();
-    }
-
-    public void scheduleAlarm(){
-        Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
-        final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        long firstMillis = System.currentTimeMillis();
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
-                (long)30000, pIntent);
+        MyIntentService.startLoopTrackData(this);
+        receive = new Receiver();
+        IntentFilter filter = new IntentFilter(MyIntentService.ACTION_GETTRACKDATA);
+        filter.addAction(MyIntentService.ACTION_GETBUSSTOP);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receive,filter);
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -222,9 +268,16 @@ public class MainMap extends AppCompatActivity
             getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE).edit().clear().apply();
         }
 
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.action_logout) {
+
+            Intent i = new Intent(this,Login.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            MyIntentService.loop = false;
+            getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE).edit().clear().commit();
+            startActivity(i);
+            finish();
+        }
+// else if (id == R.id.nav_gallery) {
 //
 //        } else if (id == R.id.nav_slideshow) {
 //
@@ -291,11 +344,12 @@ public class MainMap extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mapReady = true;
         m_map = googleMap;
+        m_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         currentloc = CameraPosition.builder()
                 .target(new LatLng(22.3216178, 87.3009507))
                 .zoom(17)
-                .bearing(0)
-                //   .tilt(45)
+                .bearing(70)
+                .tilt(25)
                 .build();
         m_map.moveCamera(CameraUpdateFactory.newCameraPosition(currentloc));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -313,11 +367,98 @@ public class MainMap extends AppCompatActivity
         m_map.getUiSettings().setMyLocationButtonEnabled(true);
         Log.d("mapreadyfunction", mBusCount + "");
         for (int i = 0; i < mBusCount; i++) {
+//            final int y = i;
             Log.d("mapreadyfunction", "calledhere");
             mBuses.get(i).setMarker(m_map.addMarker(mBuses.get(i).getMarkerOptions()));
+            Log.d("mayank123", "Bus code" + mBuses.get(i).getBusCode());
+
+
+            mMarkersHashMap.put(mBuses.get(i).getMarker(), new MyMarker(mBuses.get(i)));
+
+
+            m_map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+                // Use default InfoWindow frame
+                @Override
+                public View getInfoWindow(Marker arg0) {
+                    return null;
+                }
+
+                // Defines the contents of the InfoWindow
+                @Override
+                public View getInfoContents(Marker arg0) {
+
+                    // Getting view from the layout file info_window_layout
+                    View v = getLayoutInflater().inflate(R.layout.windowlayout, null);
+
+                    // Getting the position from the marker
+                    LatLng latLng = arg0.getPosition();
+
+                    if (mMarkersHashMap.get(arg0)!= null) {
+
+                        MyMarker mar = mMarkersHashMap.get(arg0);
+                        Log.d("mayank123", mar.getBus().getBusCode());
+                        Log.d("mayank123", "notnullbus");
+
+                        Bus mybus = mMarkersHashMap.get(arg0).getBus();
+                        TextView busName = (TextView) v.findViewById(R.id.busName);
+                        TextView route = (TextView) v.findViewById(R.id.route);
+                        TextView busNumber = (TextView) v.findViewById(R.id.busNumber);
+                        TextView busDistance = (TextView) v.findViewById(R.id.busDistance);
+
+                        busName.setText(mybus.getmBusName());
+                        route.setText(mybus.getmBusRoute());
+                        busNumber.setText(mybus.getmBusNumber());
+
+                    } else {
+                        TextView busName = (TextView) v.findViewById(R.id.busName);
+                        TextView route = (TextView) v.findViewById(R.id.route);
+                        TextView busNumber = (TextView) v.findViewById(R.id.busNumber);
+                        TextView busDistance = (TextView) v.findViewById(R.id.busDistance);
+
+                        busName.setText("Bus Stop - " + MainMap.mLoc);
+                        route.setVisibility(View.GONE);
+                        busNumber.setVisibility(View.GONE);
+                        busDistance.setVisibility(View.GONE);
+                        Log.d("mayank123", "nullbus");
+                    }
+                    // Getting reference to the TextView to set latitude
+
+                    // Getting reference to the TextView to set longitude
+
+
+                    // Setting the latitude
+
+
+                    // Setting the longitude
+
+
+                    // Returning the view containing InfoWindow contents
+                    return v;
+
+                }
+            });
+
+            m_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+
+                @Override
+                public boolean onMarkerClick(Marker arg0) {
+                    if (!arg0.isInfoWindowShown()) {
+                        arg0.showInfoWindow();
+                    } else {
+                        arg0.hideInfoWindow();
+                    }
+
+
+                    return true;
+
+                }
+            });
+
         }
-        m_map.setOnMyLocationChangeListener(myLocationChangeListener);
+    m_map.setOnMyLocationChangeListener(myLocationChangeListener);
     }
+
 
     @Override
     public void onResult(@NonNull Status status) {
@@ -399,5 +540,60 @@ public class MainMap extends AppCompatActivity
         mUserLocation = null;
         mBuses = null;
         m_map = null;
+        mBusStop = null;
+        mLoc = null; // user location got from Bus Stop
+        mBusStopMarker = null;
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receive);
+    }
+    private class Receiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(MyIntentService.ACTION_GETTRACKDATA)) {
+                try {
+                    JSONObject response = new JSONObject(intent.getStringExtra(Constants.INTENT_RESPONSE));
+                    if (response.getBoolean(Constants.RESPONSE_STATUS)) {
+                        JSONArray data = response.getJSONArray(Constants.RESPONSE_DATA);
+                        for (int i = 0; i < data.length(); i++) {
+                            JSONObject track = data.getJSONObject(i);
+                            for (int j = 0; j < mBuses.size(); j++) {
+                                if (mBuses.get(j).getBusCode().equals(track.getString(Constants.RESPONSE_BUSCODE))) {
+                                    mBuses.get(i).setBusPosition(parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LAT)),
+                                            parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LON)));
+                                }
+                            }
+                        }
+                        if(mActiveBus != null && mBusStop != null){
+                            mActiveBus.findRouteFromPosition(mBusStop.latitude,mBusStop.longitude);
+                        }
+                        Log.d("update", "Updated");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            else if(intent.getAction().equals(MyIntentService.ACTION_GETBUSSTOP)){
+                try {
+                    Log.d(LOG_TAG,"RECEIVED");
+                    JSONObject response = new JSONObject(intent.getStringExtra(Constants.INTENT_RESPONSE));
+                    if(response.getBoolean(Constants.RESPONSE_STATUS)){
+                        JSONObject data = response.getJSONObject(Constants.RESPONSE_DATA);
+                        if(!data.getString(Constants.RESPONSE_LOC).equals("Rest")) {
+                            mLoc = data.getString(Constants.RESPONSE_LOC);
+                            mBusStop = new LatLng(data.getJSONObject(Constants.RESPONSE_BUSSTOP).getDouble(Constants.RESPONSE_LAT),
+                                    data.getJSONObject(Constants.RESPONSE_BUSSTOP).getDouble(Constants.RESPONSE_LON)
+                            );
+                            if (mActiveBus != null) {
+                                mActiveBus.findRouteFromPosition(mBusStop.latitude, mBusStop.longitude);
+                            }
+                        }
+                        else if(mActiveBus != null) {
+                            mActiveBus.findRouteFromPosition(null, null);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
