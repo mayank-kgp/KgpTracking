@@ -21,6 +21,8 @@ public class Constants {
     public static final String RESPONSE_BUSNUMBER = "bus_number";
     public static final String RESPONSE_BUSCODE = "bus_code";
     public static final String RESPONSE_BUSROUTE = "bus_route";
+    public static final String RESPONSE_ROUTE = "route";
+    public static final String RESPONSE_COG = "cog";
     public static final String RESPONSE_ACTIVE = "active";
     public static final String RESPONSE_COORDINATES= "coordinates";
     public static final String RESPONSE_LAT= "lat";

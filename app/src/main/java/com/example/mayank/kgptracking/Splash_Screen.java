@@ -1,20 +1,25 @@
 package com.example.mayank.kgptracking;
 
+import android.Manifest;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 public class Splash_Screen extends AppCompatActivity {
 
@@ -24,9 +29,15 @@ public class Splash_Screen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash__screen);
-
+        Log.d("Splash","sdadsa");
         ActionBar actionBar = getActionBar();
-
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    69);
+        }
         if (actionBar != null) {
             actionBar.hide();
         }
@@ -163,6 +174,26 @@ public class Splash_Screen extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceive);
         super.onDestroy();
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 69: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
+
+                } else {
+                    Toast.makeText(this,"App needs to access user location for better experience",Toast.LENGTH_LONG);
+                    finish();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
 }
 //eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxMDM0NDQ0ODI4OTMyNzMwNjk2NjUiLCJlbWFpbCI6InNhaGlsdnMwMDBAZ21haWwuY29tIiwibmFtZSI6InNhaGlsIGNoYWRkaGEiLCJleHAiOjE0Nzk1NTk2NjYuNDM2OX0.DYn0Cu8Fe4fYizLBns_0owR0GEPo5n4xqSoEOyX7JpA

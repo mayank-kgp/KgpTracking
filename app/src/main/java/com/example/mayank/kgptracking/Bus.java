@@ -30,9 +30,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Bus implements RoutingListener {
     private String mBusName;
@@ -44,13 +50,17 @@ public class Bus implements RoutingListener {
     private Button mBusButton;
     private Marker mMarker;
     private MarkerOptions mMarkerOptions;
+    private MarkerOptions mDirectionOptions;
+    private Marker mDirectionMarker;
     private Context mContext;
     private String mBusCode;
+    private List<LatLng> mRoute;
+    private Double mCOG;
     private boolean mActive = false;
 
 
 
-    public Bus(Context context, String busRoute, String buscode, String busNumber, String busName, Double Lat, Double Lng){
+    public Bus(Context context, String busRoute,String route,double cog, String buscode, String busNumber, String busName, Double Lat, Double Lng){
         mLat = Lat;
         mLng = Lng;
         mBusCode = buscode;
@@ -59,6 +69,16 @@ public class Bus implements RoutingListener {
         mBusNumber = busNumber;
         mBusRoute = busRoute;
         mContext = context;
+        mCOG = cog;
+        mRoute = new ArrayList<LatLng>();
+        try {
+            JSONArray JSONroute = new JSONObject(route).getJSONArray("Route");
+            for(int i = 0 ; i<JSONroute.length(); i++){
+                mRoute.add(new LatLng(JSONroute.getJSONObject(i).getDouble("lat"),JSONroute.getJSONObject(i).getDouble("lng")));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         //LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rootView = ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
         //View rootView = super.findViewById(android.R.id.content);
@@ -124,6 +144,11 @@ public class Bus implements RoutingListener {
                             .title(mBusName)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_48));
         //mMarker = m_map.addMarker(mMarkerOptions);
+        mDirectionOptions = new MarkerOptions()
+                                .position(mLocation)
+                                .flat(true)
+                                .rotation((float) cog)
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.arrow));
         MainMap.mBusCount++;
         Log.d("Inside Construct",MainMap.mBusCount+"");
     }
@@ -190,14 +215,22 @@ public class Bus implements RoutingListener {
     public void setMarker(Marker marker){
         mMarker = marker;
     }
+    public void setDirectionMarker(Marker marker){
+        mDirectionMarker = marker;
+    }
     public MarkerOptions getMarkerOptions(){
         return mMarkerOptions;
     }
-    public void setBusPosition(Double Lat,Double Lng){
+    public MarkerOptions getDirectionOptions(){
+        return mDirectionOptions;
+    }
+    public void setBusPosition(Double Lat,Double Lng,double cog){
         mLat = Lat;
         mLng = Lng;
         mLocation = new LatLng(Lat,Lng);
         mMarker.setPosition(new LatLng(Lat,Lng));
+        mCOG = cog;
+        mDirectionMarker.setRotation((float) cog);
     }
     public String getBusCode(){
         return mBusCode;
@@ -220,6 +253,7 @@ public class Bus implements RoutingListener {
             CameraPosition newPosition = new CameraPosition.Builder()
                     .target(mLocation)
                     .zoom(17)
+                    .tilt(25)
                     .build();
             MainMap.m_map.animateCamera(CameraUpdateFactory.newCameraPosition(newPosition),1000,null);
             mMarker.showInfoWindow();
@@ -267,7 +301,7 @@ public class Bus implements RoutingListener {
         }*/
     }
     public void findRouteFromPosition(Double Lat, Double Lng){
-        Log.d("KGPTracking","Find                                                                                                                                                                                                                                                                                                                   Route" );
+        Log.d("KGPTracking","Find Route" );
         Routing routing;
         if(Lat == null || Lng == null){
             routing = new Routing.Builder()
@@ -289,10 +323,42 @@ public class Bus implements RoutingListener {
     }
     public void showRouteOnMap(ArrayList<Route> routes, int shortestRouteIndex){
         Log.d("KGPTracking","Show Route" );
+        Gson gson = new Gson();
+        Log.d("BUS",gson.toJson(routes));
         PolylineOptions polyOptions = new PolylineOptions();
         polyOptions.color(mContext.getResources().getColor(R.color.blue));
         polyOptions.width(10);
         polyOptions.addAll(routes.get(shortestRouteIndex).getPoints());
+        if(MainMap.mBusStop != null){
+            if(MainMap.mBusStopMarker == null) {
+                MarkerOptions busStopOptions = new MarkerOptions()
+                        .position(MainMap.mBusStop)
+                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.busstop))
+                        .title("Bus Stop - " + MainMap.mLoc);
+                MainMap.mBusStopMarker = MainMap.m_map.addMarker(busStopOptions);
+                MainMap.mBusStopMarker.showInfoWindow();
+            }
+        }
+        if(MainMap.mActivePolyline != null){ // remove Current Active Polyline everytime before addin g new active Polyline
+            MainMap.mActivePolyline.remove();
+            MainMap.mActivePolyline = null;
+        }
+        if(this.equals(MainMap.mActiveBus)) {  // Check if Active Bus right now is equal to the original Bus Where this callback is called
+            MainMap.mActivePolyline = MainMap.m_map.addPolyline(polyOptions);
+        }
+        else if(MainMap.mActiveBus != null){
+            MainMap.mActiveBus.setBusInFocus();
+        }
+    }
+    public void showRouteOnMap(){
+        Log.d("KGPTracking","Show Route" );
+//        Gson gson = new Gson();
+//        Log.d("BUS",gson.toJson(routes));
+        PolylineOptions polyOptions = new PolylineOptions();
+        polyOptions.color(mContext.getResources().getColor(R.color.blue));
+        polyOptions.width(10);
+        Log.d("KGPTracking",mRoute.toString());
+        polyOptions.addAll(mRoute);
         if(MainMap.mBusStop != null){
             if(MainMap.mBusStopMarker == null) {
                 MarkerOptions busStopOptions = new MarkerOptions()
@@ -323,7 +389,7 @@ public class Bus implements RoutingListener {
     }
     @Override
     public void onRoutingSuccess(ArrayList<Route> arrayList, int shortestRouteIndex) {
-        showRouteOnMap(arrayList,shortestRouteIndex);
+       // showRouteOnMap(arrayList,shortestRouteIndex);
     }
     @Override
     public void onRoutingCancelled() {

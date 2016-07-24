@@ -178,7 +178,7 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
                     Log.d("FromPreference",preferences.getString(Constants.ACCESS_TOKEN,"not there"));
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),"Login failed. Please Try Again!",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Login failed. Please Try Again! " +response.getString(Constants.RESPONSE_ERROR),Toast.LENGTH_SHORT).show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

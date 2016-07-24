@@ -118,6 +118,8 @@ public class MainMap extends AppCompatActivity
                 JSONObject bus = Busdata.getJSONObject(i);
                 JSONObject track = Trackdata.getJSONObject(i);
                 mBuses.add(new Bus(this,bus.getString(Constants.RESPONSE_BUSROUTE),
+                        bus.getString(Constants.RESPONSE_ROUTE),
+                        parseDouble (track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_COG)),
                         bus.getString(Constants.RESPONSE_BUSCODE),bus.getString(Constants.RESPONSE_BUSNUMBER),
                         bus.getString(Constants.RESPONSE_BUSNAME),
                         parseDouble (track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LAT)),
@@ -344,7 +346,8 @@ public class MainMap extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mapReady = true;
         m_map = googleMap;
-        m_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+//        m_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        m_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         currentloc = CameraPosition.builder()
                 .target(new LatLng(22.3216178, 87.3009507))
                 .zoom(17)
@@ -369,7 +372,8 @@ public class MainMap extends AppCompatActivity
         for (int i = 0; i < mBusCount; i++) {
 //            final int y = i;
             Log.d("mapreadyfunction", "calledhere");
-            mBuses.get(i).setMarker(m_map.addMarker(mBuses.get(i).getMarkerOptions()));
+             mBuses.get(i).setMarker(m_map.addMarker(mBuses.get(i).getMarkerOptions()));
+             mBuses.get(i).setDirectionMarker(m_map.addMarker(mBuses.get(i).getDirectionOptions()));
             Log.d("mayank123", "Bus code" + mBuses.get(i).getBusCode());
 
 
@@ -457,6 +461,9 @@ public class MainMap extends AppCompatActivity
 
         }
     m_map.setOnMyLocationChangeListener(myLocationChangeListener);
+    LatLng start = new LatLng(22.319374813875854,87.30454757809639);
+    LatLng end = new LatLng(22.32014276220924,87.30335265398026);
+
     }
 
 
@@ -558,12 +565,14 @@ public class MainMap extends AppCompatActivity
                             for (int j = 0; j < mBuses.size(); j++) {
                                 if (mBuses.get(j).getBusCode().equals(track.getString(Constants.RESPONSE_BUSCODE))) {
                                     mBuses.get(i).setBusPosition(parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LAT)),
-                                            parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LON)));
+                                            parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LON)),
+                                            parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_COG)));
                                 }
                             }
                         }
                         if(mActiveBus != null && mBusStop != null){
-                            mActiveBus.findRouteFromPosition(mBusStop.latitude,mBusStop.longitude);
+                            //mActiveBus.findRouteFromPosition(mBusStop.latitude,mBusStop.longitude);
+                            mActiveBus.showRouteOnMap();
                         }
                         Log.d("update", "Updated");
                     }
@@ -583,11 +592,13 @@ public class MainMap extends AppCompatActivity
                                     data.getJSONObject(Constants.RESPONSE_BUSSTOP).getDouble(Constants.RESPONSE_LON)
                             );
                             if (mActiveBus != null) {
-                                mActiveBus.findRouteFromPosition(mBusStop.latitude, mBusStop.longitude);
+//                                mActiveBus.findRouteFromPosition(mBusStop.latitude, mBusStop.longitude);
+                                mActiveBus.showRouteOnMap();
                             }
                         }
                         else if(mActiveBus != null) {
-                            mActiveBus.findRouteFromPosition(null, null);
+//                            mActiveBus.findRouteFromPosition(null, null);
+                            mActiveBus.showRouteOnMap();
                         }
                     }
                 } catch (JSONException e) {
