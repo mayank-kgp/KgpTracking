@@ -228,8 +228,9 @@ public class Bus implements RoutingListener {
         mLat = Lat;
         mLng = Lng;
         mLocation = new LatLng(Lat,Lng);
-        mMarker.setPosition(new LatLng(Lat,Lng));
+        mMarker.setPosition(mLocation);
         mCOG = cog;
+        mDirectionMarker.setPosition(mLocation);
         mDirectionMarker.setRotation((float) cog);
     }
     public String getBusCode(){
