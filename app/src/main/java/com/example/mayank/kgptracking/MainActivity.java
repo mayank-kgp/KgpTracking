@@ -475,6 +475,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onInfoWindowClick(Marker marker) {
+        Log.d("abcd","hide2");
         marker.hideInfoWindow();
     }
 

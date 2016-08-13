@@ -30,7 +30,7 @@ public class Splash_Screen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash__screen);
         Log.d("Splash","sdadsa");
-        ActionBar actionBar = getActionBar();
+        //ActionBar actionBar = getActionBar();
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -38,9 +38,9 @@ public class Splash_Screen extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     69);
         }
-        if (actionBar != null) {
-            actionBar.hide();
-        }
+//        if (actionBar != null) {
+//            actionBar.hide();
+//        }
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
     }
 

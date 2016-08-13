@@ -68,7 +68,7 @@ public class MainMap extends AppCompatActivity
     public static Bus mActiveBus = null; // Sahil
     public static GoogleMap m_map;
     public static LatLng mUserLocation = null;
-    boolean mapReady = false;
+    static boolean mapReady = false;
     CameraPosition currentloc;
 
     private final String LOG_TAG = "MayankApp";
@@ -107,8 +107,12 @@ public class MainMap extends AppCompatActivity
         JSONArray Busdata = null;
         JSONArray Trackdata = null;
         try {
-            Busdata = new JSONArray(data.get("Busdata"));
-            Trackdata = new JSONArray(data.get("Trackdata"));
+            //if(data.get("Busdata")!=null) {
+                Busdata = new JSONArray(data.get("Busdata"));
+            //}
+            //if(data.get("Trackdata")!=null) {
+                Trackdata = new JSONArray(data.get("Trackdata"));
+            //}
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -344,17 +348,23 @@ public class MainMap extends AppCompatActivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mapReady = true;
-        m_map = googleMap;
+       // if(mUserLocation!=null) {
+        if(mapReady){
+            return;
+        }
+            mapReady = true;
+            m_map = googleMap;
 //        m_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        m_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        currentloc = CameraPosition.builder()
-                .target(new LatLng(22.3216178, 87.3009507))
-                .zoom(17)
-                .bearing(70)
-                .tilt(25)
-                .build();
-        m_map.moveCamera(CameraUpdateFactory.newCameraPosition(currentloc));
+            m_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            currentloc = CameraPosition.builder()
+                    .target(new LatLng(22.3216178, 87.3009507))
+                   // .target(mUserLocation)
+                    .zoom(17)
+                    .bearing(70)
+                    .tilt(25)
+                    .build();
+            m_map.moveCamera(CameraUpdateFactory.newCameraPosition(currentloc));
+      //  }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -366,6 +376,19 @@ public class MainMap extends AppCompatActivity
 
         }
         m_map.setMyLocationEnabled(true);
+
+        m_map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+            @Override
+            public void onMapClick(LatLng arg0) {
+                if(mActiveBus!=null) {
+                    mActiveBus.getMarker().showInfoWindow();
+                    // currentMarker.showInfoWindow();
+                    //do nothing
+                }
+            }
+
+        });
 
         m_map.getUiSettings().setMyLocationButtonEnabled(true);
         Log.d("mapreadyfunction", mBusCount + "");
@@ -398,10 +421,14 @@ public class MainMap extends AppCompatActivity
                     // Getting the position from the marker
                     LatLng latLng = arg0.getPosition();
 
+                    if(arg0.isFlat()){
+                        return null;
+                    }
+
                     if (mMarkersHashMap.get(arg0)!= null) {
 
                         MyMarker mar = mMarkersHashMap.get(arg0);
-                        Log.d("mayank123", mar.getBus().getBusCode());
+                           Log.d("mayank123", mar.getBus().getBusCode());
                         Log.d("mayank123", "notnullbus");
 
                         Bus mybus = mMarkersHashMap.get(arg0).getBus();
@@ -445,16 +472,20 @@ public class MainMap extends AppCompatActivity
 
             m_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
+
+
                 @Override
                 public boolean onMarkerClick(Marker arg0) {
                     if (!arg0.isInfoWindowShown()) {
                         arg0.showInfoWindow();
                     } else {
+                        Log.d("abcd","hide3");
                         arg0.hideInfoWindow();
+                        Log.d("HERE","MARKER_LISTNER");
                     }
 
 
-                    return true;
+                    return false;
 
                 }
             });

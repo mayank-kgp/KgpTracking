@@ -24,6 +24,7 @@ import com.directions.route.RouteException;
 import com.directions.route.Routing;
 import com.directions.route.RoutingListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -57,6 +58,7 @@ public class Bus implements RoutingListener {
     private List<LatLng> mRoute;
     private Double mCOG;
     private boolean mActive = false;
+    static boolean buttonclicke = false;
 
 
 
@@ -240,6 +242,7 @@ public class Bus implements RoutingListener {
         return mActive;
     }
     public void setBusInFocus(/*Bus activeBus*/) {
+        buttonclicke = true;
        /* if(activeBus != null){
             activeBus.setBusInOrOutFocus(null);
         }*/
@@ -251,16 +254,18 @@ public class Bus implements RoutingListener {
         }*/
         /*else*/{
             mBusButton.setBackgroundColor(Color.BLUE);
+            mBusButton.setTextColor(Color.WHITE);
             CameraPosition newPosition = new CameraPosition.Builder()
                     .target(mLocation)
                     .zoom(17)
                     .tilt(25)
                     .build();
             MainMap.m_map.animateCamera(CameraUpdateFactory.newCameraPosition(newPosition),1000,null);
-            mMarker.showInfoWindow();
+
             MainMap.mActiveBus = this;
             mActive = true;
-            MyIntentService.startGetBusStop(mContext);
+            MyIntentService.startGetBusStop(mContext,mMarker);
+
            /* if(MainMap.mUserLocation != null)
             findRouteFromPosition(MainMap.mUserLocation.latitude ,MainMap.mUserLocation.longitude);
             else{
@@ -275,6 +280,9 @@ public class Bus implements RoutingListener {
         }*/
         /*if(isActive())*/{
             mBusButton.setBackgroundColor(Color.WHITE);
+            mBusButton.setTextColor(Color.BLACK);
+            Log.d("BUS CLASS","HERE");
+            Log.d("abcd","hide1");
             mMarker.hideInfoWindow();
             MainMap.mActiveBus = null;
             mActive = false;
@@ -366,8 +374,9 @@ public class Bus implements RoutingListener {
                         .position(MainMap.mBusStop)
                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.busstop))
                         .title("Bus Stop - " + MainMap.mLoc);
-                MainMap.mBusStopMarker = MainMap.m_map.addMarker(busStopOptions);
-                MainMap.mBusStopMarker.showInfoWindow();
+                  MainMap.mBusStopMarker = MainMap.m_map.addMarker(busStopOptions);
+
+ //               MainMap.mBusStopMarker.showInfoWindow();
             }
         }
         if(MainMap.mActivePolyline != null){ // remove Current Active Polyline everytime before addin g new active Polyline

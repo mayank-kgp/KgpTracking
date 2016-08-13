@@ -13,6 +13,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.model.Marker;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,10 +53,13 @@ public class MyIntentService extends IntentService {
         });
         t.start();
     }
-    public static void startGetBusStop(Context context) {
+    public static void startGetBusStop(Context context, Marker mMarker) {
         Intent intent = new Intent(context, MyIntentService.class);
         intent.setAction(ACTION_GETBUSSTOP);
         context.startService(intent);
+        if(mMarker.isInfoWindowShown()==false) {
+            mMarker.showInfoWindow();
+        }
     }
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -76,8 +80,10 @@ public class MyIntentService extends IntentService {
         }
     }
     private void handleActionGetBusStop() {
-        String url = Constants.API_BUSSTOPURL+"?user_lat="+MainMap.mUserLocation.latitude+"&user_lon="+MainMap.mUserLocation.longitude;
-        getResponseString(url,ACTION_GETBUSSTOP,Request.Method.GET,null);
+        if(MainMap.mUserLocation!=null) {
+            String url = Constants.API_BUSSTOPURL + "?user_lat=" + MainMap.mUserLocation.latitude + "&user_lon=" + MainMap.mUserLocation.longitude;
+            getResponseString(url, ACTION_GETBUSSTOP, Request.Method.GET, null);
+        }
     }
     private static void startjob(Context context){
         Log.d("abcd","startjob executecd");
