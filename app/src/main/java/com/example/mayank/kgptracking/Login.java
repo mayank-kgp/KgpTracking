@@ -172,8 +172,12 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
                     editor.putFloat(Constants.TOKEN_EXP, BigDecimal.valueOf(data.getDouble(Constants.TOKEN_EXP)).floatValue());
                     editor.putString(Constants.PIC_URL, data.getString(Constants.PIC_URL));
                     editor.putString(Constants.TOKEN_TYPE, data.getString(Constants.TOKEN_TYPE));
-                    editor.commit();
+                    if(editor.commit()){
+                        Log.d("Login", "Values saved !");
+                    }
                     Log.d("MyIntentService",data.getString(Constants.ACCESS_TOKEN));
+                    Log.d("FromPreference",preferences.getString(Constants.ACCESS_TOKEN,"not there"));
+                    Log.d("FromPreference Time",preferences.getString(Constants.TOKEN_EXP,"not there exp"));
                     MyIntentService.startGetBusData(getApplicationContext());
                     MyIntentService.startGetTrackData(getApplicationContext());
                     Log.d("FromPreference",preferences.getString(Constants.ACCESS_TOKEN,"not there"));
