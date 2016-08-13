@@ -75,8 +75,13 @@ public class Bus implements RoutingListener {
         mRoute = new ArrayList<LatLng>();
         try {
             JSONArray JSONroute = new JSONObject(route).getJSONArray("Route");
-            for(int i = 0 ; i<JSONroute.length(); i++){
-                mRoute.add(new LatLng(JSONroute.getJSONObject(i).getDouble("lat"),JSONroute.getJSONObject(i).getDouble("lng")));
+            if(JSONroute == null || JSONroute.length() == 0){
+                mRoute = null;
+            }
+            else {
+                for (int i = 0; i < JSONroute.length(); i++) {
+                    mRoute.add(new LatLng(JSONroute.getJSONObject(i).getDouble("lat"), JSONroute.getJSONObject(i).getDouble("lng")));
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -363,31 +368,33 @@ public class Bus implements RoutingListener {
         Log.d("KGPTracking","Show Route" );
 //        Gson gson = new Gson();
 //        Log.d("BUS",gson.toJson(routes));
-        PolylineOptions polyOptions = new PolylineOptions();
-        polyOptions.color(mContext.getResources().getColor(R.color.blue));
-        polyOptions.width(10);
-        Log.d("KGPTracking",mRoute.toString());
-        polyOptions.addAll(mRoute);
+        if(mRoute!=null) {
+            PolylineOptions polyOptions = new PolylineOptions();
+            polyOptions.color(mContext.getResources().getColor(R.color.blue));
+            polyOptions.width(10);
+            Log.d("KGPTracking", mRoute.toString());
+            polyOptions.addAll(mRoute);
+
+            if (MainMap.mActivePolyline != null) { // remove Current Active Polyline everytime before addin g new active Polyline
+                MainMap.mActivePolyline.remove();
+                MainMap.mActivePolyline = null;
+            }
+            if (this.equals(MainMap.mActiveBus)) {  // Check if Active Bus right now is equal to the original Bus Where this callback is called
+                MainMap.mActivePolyline = MainMap.m_map.addPolyline(polyOptions);
+            } else if (MainMap.mActiveBus != null) {
+                MainMap.mActiveBus.setBusInFocus();
+            }
+        }
         if(MainMap.mBusStop != null){
             if(MainMap.mBusStopMarker == null) {
                 MarkerOptions busStopOptions = new MarkerOptions()
                         .position(MainMap.mBusStop)
                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.busstop))
                         .title("Bus Stop - " + MainMap.mLoc);
-                  MainMap.mBusStopMarker = MainMap.m_map.addMarker(busStopOptions);
+                MainMap.mBusStopMarker = MainMap.m_map.addMarker(busStopOptions);
 
- //               MainMap.mBusStopMarker.showInfoWindow();
+                //               MainMap.mBusStopMarker.showInfoWindow();
             }
-        }
-        if(MainMap.mActivePolyline != null){ // remove Current Active Polyline everytime before addin g new active Polyline
-            MainMap.mActivePolyline.remove();
-            MainMap.mActivePolyline = null;
-        }
-        if(this.equals(MainMap.mActiveBus)) {  // Check if Active Bus right now is equal to the original Bus Where this callback is called
-            MainMap.mActivePolyline = MainMap.m_map.addPolyline(polyOptions);
-        }
-        else if(MainMap.mActiveBus != null){
-            MainMap.mActiveBus.setBusInFocus();
         }
     }
     @Override
