@@ -3,6 +3,7 @@ package com.example.mayank.kgptracking;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -26,16 +27,34 @@ public class MyIntentService extends IntentService {
     public MyIntentService() {
         super("MyIntentService");
     }
-    public static void startGetBusData(Context context) {
-        Intent intent = new Intent(context, MyIntentService.class);
-        intent.setAction(ACTION_GETBUSDATA);
-        context.startService(intent);
+    private static boolean isTokenExpired(Context context){
+        SharedPreferences preferences = context.getSharedPreferences(Constants.LOGIN_FILE,Context.MODE_PRIVATE);
+        float exp_time = preferences.getFloat(Constants.TOKEN_EXP, (float) 1.0);
+        if(System.currentTimeMillis()*1000 > exp_time){
+            Intent i = new Intent(context,Login.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            MyIntentService.loop = false;
+            context.getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE).edit().clear().commit();
+            context.startActivity(i);
+            return true;
+        }
+        else return false;
     }
+    public static void startGetBusData(Context context) {
+        if(!isTokenExpired(context)){
+            Intent intent = new Intent(context, MyIntentService.class);
+            intent.setAction(ACTION_GETBUSDATA);
+            context.startService(intent);
+        }
+    }
+
     public static void startGetTrackData(Context context) {
-        Intent intent = new Intent(context, MyIntentService.class);
-        intent.setAction(ACTION_GETTRACKDATA);
-        Log.d("MyIntentService","Track data started");
-        context.startService(intent);
+        if(!isTokenExpired(context)) {
+            Intent intent = new Intent(context, MyIntentService.class);
+            intent.setAction(ACTION_GETTRACKDATA);
+            Log.d("MyIntentService", "Track data started");
+            context.startService(intent);
+        }
     }
     public static void startPutUserData(Context context,String idtoken) {
         Intent intent = new Intent(context, MyIntentService.class);
@@ -54,11 +73,13 @@ public class MyIntentService extends IntentService {
         t.start();
     }
     public static void startGetBusStop(Context context, Marker mMarker) {
-        Intent intent = new Intent(context, MyIntentService.class);
-        intent.setAction(ACTION_GETBUSSTOP);
-        context.startService(intent);
-        if(mMarker.isInfoWindowShown()==false) {
-            mMarker.showInfoWindow();
+        if(!isTokenExpired(context)) {
+            Intent intent = new Intent(context, MyIntentService.class);
+            intent.setAction(ACTION_GETBUSSTOP);
+            context.startService(intent);
+            if (mMarker.isInfoWindowShown() == false) {
+                mMarker.showInfoWindow();
+            }
         }
     }
     @Override
@@ -90,7 +111,7 @@ public class MyIntentService extends IntentService {
         MyIntentService.startGetTrackData(context);
         while(loop) {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(5000);
                 Log.d("abcd", "Try working");
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -109,6 +130,7 @@ public class MyIntentService extends IntentService {
         getResponseString(Constants.API_BUSDATAURL,ACTION_GETBUSDATA,Request.Method.GET,null);;
     }
     private void getResponse(String url, final String action, int method, final String putdata){
+
         RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(),
                 new CustomHurlStack(this));
         //Log.d("MyIntentService",putdata);
