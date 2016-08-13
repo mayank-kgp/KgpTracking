@@ -164,6 +164,7 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
                     JSONObject data = response.getJSONObject(Constants.RESPONSE_DATA);
                     SharedPreferences preferences = getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = preferences.edit();
+                    Log.d("Received Exp_time",data.getDouble(Constants.TOKEN_EXP) +"  -  "+BigDecimal.valueOf(data.getDouble(Constants.TOKEN_EXP)).floatValue());
                     editor.putBoolean(Constants.isLogin, true);
                     editor.putString(Constants.ACCESS_TOKEN, data.getString(Constants.ACCESS_TOKEN));
                     editor.putString(Constants.USERNAME, data.getString(Constants.USERNAME));
