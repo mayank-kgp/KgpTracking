@@ -6,10 +6,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -24,19 +28,22 @@ public class MyIntentService extends IntentService {
     public static final String ACTION_PUTUSERDATA= "com.example.mayank.kgptracking.action.PUTUSERDATA";
     public static final String ACTION_GETBUSSTOP= "com.example.mayank.kgptracking.action.GETBUSSTOP";
     public static boolean loop = true;
+    public static boolean isLoginForeground = false;
     public MyIntentService() {
         super("MyIntentService");
     }
     private static boolean isTokenExpired(Context context){
         SharedPreferences preferences = context.getSharedPreferences(Constants.LOGIN_FILE,Context.MODE_PRIVATE);
         float exp_time = preferences.getFloat(Constants.TOKEN_EXP, (float) 1.0);
-        if(System.currentTimeMillis()*1000 > exp_time){
-            Log.d("MyIntentService","Token Expired" + System.currentTimeMillis()*1000 + "  " + exp_time );
-            Intent i = new Intent(context,Login.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            MyIntentService.loop = false;
-            context.getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE).edit().clear().commit();
-            context.startActivity(i);
+        if(System.currentTimeMillis() > exp_time*1000){
+            Log.d("MyIntentService","Token Expired" + System.currentTimeMillis() + "  " + exp_time*1000 );
+            if(!isLoginForeground){
+                Intent i = new Intent(context, Login.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                MyIntentService.loop = false;
+                context.getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE).edit().clear().commit();
+                context.startActivity(i);
+            }
             return true;
         }
         else return false;
@@ -166,9 +173,15 @@ public class MyIntentService extends IntentService {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                if(error instanceof NoConnectionError) {
-//                    Toast.makeText(MyIntentService.this, "Network Error, No Internet Connection", Toast.LENGTH_LONG).show();
-//                }
+                if(error instanceof NoConnectionError) {
+                    Toast.makeText(MyIntentService.this, "Network Error, No Internet Connection", Toast.LENGTH_SHORT).show();
+                }
+                else if(error instanceof TimeoutError){
+                    Toast.makeText(MyIntentService.this, "Network Error, Time Out Error", Toast.LENGTH_SHORT).show();
+                }
+                else if(error instanceof NetworkError){
+                    Toast.makeText(MyIntentService.this, "Network Error", Toast.LENGTH_SHORT).show();
+                }
                 Log.d("MyIntentservice",error.toString() + error.getMessage());
             }
         });
@@ -211,9 +224,15 @@ public class MyIntentService extends IntentService {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                if(error instanceof NoConnectionError) {
-//                    Toast.makeText(MyIntentService.this, "Network Error, No Internet Connection", Toast.LENGTH_LONG).show();
-//                }
+                if(error instanceof NoConnectionError) {
+                    Toast.makeText(MyIntentService.this, "Network Error, No Internet Connection", Toast.LENGTH_SHORT).show();
+                }
+                else if(error instanceof TimeoutError){
+                    Toast.makeText(MyIntentService.this, "Network Error, Time Out Error", Toast.LENGTH_SHORT).show();
+                }
+                else if(error instanceof NetworkError){
+                    Toast.makeText(MyIntentService.this, "Network Error", Toast.LENGTH_SHORT).show();
+                }
                 Log.d("MyIntentservice",error.toString() + error.getMessage());
             }
         });

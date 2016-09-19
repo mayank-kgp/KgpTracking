@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.lang.Double.parseDouble;
+
 public class Bus implements RoutingListener {
     private String mBusName;
     private String mBusNumber;
@@ -59,10 +61,12 @@ public class Bus implements RoutingListener {
     private Double mCOG;
     private boolean mActive = false;
     static boolean buttonclicke = false;
+    public List<MarkerOptions> mTailingMarkersOptions;
+    public List<Marker> mTailingMarkers;
 
 
-
-    public Bus(Context context, String busRoute,String route,double cog, String buscode, String busNumber, String busName, Double Lat, Double Lng){
+    public Bus(Context context, String busRoute,String route,double cog, String buscode, String busNumber, String busName, Double Lat, Double Lng, JSONArray busTailing){
+        int marker_decide = MainMap.mBusCount%4;
         mLat = Lat;
         mLng = Lng;
         mBusCode = buscode;
@@ -73,6 +77,8 @@ public class Bus implements RoutingListener {
         mContext = context;
         mCOG = cog;
         mRoute = new ArrayList<LatLng>();
+        mTailingMarkersOptions = new ArrayList<MarkerOptions>();
+        mTailingMarkers = new ArrayList<Marker>();
         try {
             JSONArray JSONroute = new JSONObject(route).getJSONArray("Route");
             if(JSONroute == null || JSONroute.length() == 0){
@@ -83,6 +89,29 @@ public class Bus implements RoutingListener {
                     mRoute.add(new LatLng(JSONroute.getJSONObject(i).getDouble("lat"), JSONroute.getJSONObject(i).getDouble("lng")));
                 }
             }
+
+            for (int i = 1; i < busTailing.length(); i++) {
+//                mTailing.add(new LatLng(parseDouble(busTailing.getJSONObject(i).getString(Constants.RESPONSE_LAT)),
+//                        parseDouble(busTailing.getJSONObject(i).getString(Constants.RESPONSE_LON))
+//                ));
+                mTailingMarkersOptions.add(new MarkerOptions()
+                        .position(new LatLng(parseDouble(busTailing.getJSONObject(i).getString(Constants.RESPONSE_LAT)),
+                                parseDouble(busTailing.getJSONObject(i).getString(Constants.RESPONSE_LON))))
+                        .flat(true)
+                        .rotation((float) parseDouble(busTailing.getJSONObject(i).getString(Constants.RESPONSE_COG)))
+                        );
+                switch (marker_decide){
+                    case 0: mTailingMarkersOptions.get(i-1).icon(BitmapDescriptorFactory.fromResource(R.mipmap.tailing_arrow_1));
+                        break;
+                    case 1: mTailingMarkersOptions.get(i-1).icon(BitmapDescriptorFactory.fromResource(R.mipmap.tailing_arrow_2));
+                        break;
+                    case 2: mTailingMarkersOptions.get(i-1).icon(BitmapDescriptorFactory.fromResource(R.mipmap.tailing_arrow_3));
+                        break;
+                    case 3: mTailingMarkersOptions.get(i-1).icon(BitmapDescriptorFactory.fromResource(R.mipmap.tailing_arrow_4));
+                        break;
+                }
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -148,14 +177,32 @@ public class Bus implements RoutingListener {
         mBusButton.setOnClickListener((View.OnClickListener) context); // Ask Mayank set onClickListener to the context of MainMap
         mMarkerOptions = new MarkerOptions()
                             .position(mLocation)
-                            .title(mBusName)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_48));
+                            .title(mBusName);
+        switch(marker_decide){
+            case 0 : mMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.bus_1));
+                break;
+            case 1 : mMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.bus_2));
+                break;
+            case 2 : mMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.bus_3));
+                break;
+            case 3 : mMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.bus_4));
+                break;
+        }
         //mMarker = m_map.addMarker(mMarkerOptions);
         mDirectionOptions = new MarkerOptions()
                                 .position(mLocation)
                                 .flat(true)
-                                .rotation((float) cog)
-                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.arrow));
+                                .rotation((float) cog);
+        switch (marker_decide){
+            case 0: mDirectionOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.tailing_arrow_1));
+                break;
+            case 1: mDirectionOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.tailing_arrow_2));
+                break;
+            case 2: mDirectionOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.tailing_arrow_3));
+                break;
+            case 3: mDirectionOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.tailing_arrow_4));
+                break;
+        }
         MainMap.mBusCount++;
         Log.d("Inside Construct",MainMap.mBusCount+"");
     }
@@ -231,7 +278,7 @@ public class Bus implements RoutingListener {
     public MarkerOptions getDirectionOptions(){
         return mDirectionOptions;
     }
-    public void setBusPosition(Double Lat,Double Lng,double cog){
+    public void setBusPosition(Double Lat,Double Lng,double cog,JSONArray tailings){
         mLat = Lat;
         mLng = Lng;
         mLocation = new LatLng(Lat,Lng);
@@ -239,6 +286,15 @@ public class Bus implements RoutingListener {
         mCOG = cog;
         mDirectionMarker.setPosition(mLocation);
         mDirectionMarker.setRotation((float) cog);
+        for (int i = 1; i < tailings.length(); i++) {
+            try {
+                mTailingMarkers.get(i-1).setPosition(new LatLng(parseDouble(tailings.getJSONObject(i).getString(Constants.RESPONSE_LAT)),
+                        parseDouble(tailings.getJSONObject(i).getString(Constants.RESPONSE_LON))));
+                mTailingMarkers.get(i-1).setRotation((float) parseDouble(tailings.getJSONObject(i).getString(Constants.RESPONSE_COG)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
     public String getBusCode(){
         return mBusCode;
@@ -264,13 +320,19 @@ public class Bus implements RoutingListener {
                     .target(mLocation)
                     .zoom(17)
                     .tilt(25)
+                    .bearing(180)
                     .build();
             MainMap.m_map.animateCamera(CameraUpdateFactory.newCameraPosition(newPosition),1000,null);
-
+            for (Marker m : mTailingMarkers) {
+                m.setVisible(true);
+            }
             MainMap.mActiveBus = this;
             mActive = true;
-            MyIntentService.startGetBusStop(mContext,mMarker);
-
+            if(MainMap.mUserLocation != null)MyIntentService.startGetBusStop(mContext,mMarker);
+            else{
+                showRoutePolyline();
+            }
+            //findRouteFromPosition(mTailing);
            /* if(MainMap.mUserLocation != null)
             findRouteFromPosition(MainMap.mUserLocation.latitude ,MainMap.mUserLocation.longitude);
             else{
@@ -286,6 +348,9 @@ public class Bus implements RoutingListener {
         /*if(isActive())*/{
             mBusButton.setBackgroundColor(Color.WHITE);
             mBusButton.setTextColor(Color.BLACK);
+            for (Marker m : mTailingMarkers) {
+                m.setVisible(false                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          );
+            }
             Log.d("BUS CLASS","HERE");
             Log.d("abcd","hide1");
             mMarker.hideInfoWindow();
@@ -314,51 +379,42 @@ public class Bus implements RoutingListener {
             *//*return this;*//*
         }*/
     }
-    public void findRouteFromPosition(Double Lat, Double Lng){
+    public void findRouteFromPosition(/*Double Lat, Double Lng*/List<LatLng> tailing ){
         Log.d("KGPTracking","Find Route" );
         Routing routing;
-        if(Lat == null || Lng == null){
+        /*if(Lat == null || Lng == null){
             routing = new Routing.Builder()
                     .travelMode(AbstractRouting.TravelMode.WALKING)
                     .withListener(this)
                     .alternativeRoutes(true)
-                    .waypoints(mLocation /* start */,MainMap.mUserLocation /* end */)
+                    .waypoints(mLocation *//* start *//*,MainMap.mUserLocation *//* end *//*)
                     .build();
         }
-        else{
+        else{*/
             routing = new Routing.Builder()
                     .travelMode(AbstractRouting.TravelMode.WALKING)
                     .withListener(this)
                     .alternativeRoutes(true)
-                    .waypoints(mLocation /* start */,new LatLng(Lat,Lng),MainMap.mUserLocation /* end */)
+                    .waypoints(mLocation /* start */,tailing.get(1),tailing.get(2),tailing.get(3),tailing.get(4),tailing.get(5),tailing.get(6)/*MainMap.mUserLocation *//* end */)
                     .build();
-        }
+        //}
         routing.execute();
     }
-    public void showRouteOnMap(ArrayList<Route> routes, int shortestRouteIndex){
-        Log.d("KGPTracking","Show Route" );
-        Gson gson = new Gson();
-        Log.d("BUS",gson.toJson(routes));
+    public void showTailingOnMap(ArrayList<Route> routes, int shortestRouteIndex){
+        Log.d("KGPTracking","Show Tailing" );
+//        Gson gson = new Gson();
+//        Log.d("BUS",gson.toJson(routes));
         PolylineOptions polyOptions = new PolylineOptions();
         polyOptions.color(mContext.getResources().getColor(R.color.blue));
-        polyOptions.width(10);
+        polyOptions.width(8);
         polyOptions.addAll(routes.get(shortestRouteIndex).getPoints());
-        if(MainMap.mBusStop != null){
-            if(MainMap.mBusStopMarker == null) {
-                MarkerOptions busStopOptions = new MarkerOptions()
-                        .position(MainMap.mBusStop)
-                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.busstop))
-                        .title("Bus Stop - " + MainMap.mLoc);
-                MainMap.mBusStopMarker = MainMap.m_map.addMarker(busStopOptions);
-                MainMap.mBusStopMarker.showInfoWindow();
-            }
-        }
-        if(MainMap.mActivePolyline != null){ // remove Current Active Polyline everytime before addin g new active Polyline
-            MainMap.mActivePolyline.remove();
-            MainMap.mActivePolyline = null;
+
+        if(MainMap.mActiveTailing!= null){ // remove Current Active Polyline everytime before addin g new active Polyline
+            MainMap.mActiveTailing.remove();
+            MainMap.mActiveTailing= null;
         }
         if(this.equals(MainMap.mActiveBus)) {  // Check if Active Bus right now is equal to the original Bus Where this callback is called
-            MainMap.mActivePolyline = MainMap.m_map.addPolyline(polyOptions);
+            MainMap.mActiveTailing= MainMap.m_map.addPolyline(polyOptions);
         }
         else if(MainMap.mActiveBus != null){
             MainMap.mActiveBus.setBusInFocus();
@@ -366,25 +422,10 @@ public class Bus implements RoutingListener {
     }
     public void showRouteOnMap(){
         Log.d("KGPTracking","Show Route" );
+        
 //        Gson gson = new Gson();
 //        Log.d("BUS",gson.toJson(routes));
-        if(mRoute!=null) {
-            PolylineOptions polyOptions = new PolylineOptions();
-            polyOptions.color(mContext.getResources().getColor(R.color.blue));
-            polyOptions.width(10);
-            Log.d("KGPTracking", mRoute.toString());
-            polyOptions.addAll(mRoute);
-
-            if (MainMap.mActivePolyline != null) { // remove Current Active Polyline everytime before addin g new active Polyline
-                MainMap.mActivePolyline.remove();
-                MainMap.mActivePolyline = null;
-            }
-            if (this.equals(MainMap.mActiveBus)) {  // Check if Active Bus right now is equal to the original Bus Where this callback is called
-                MainMap.mActivePolyline = MainMap.m_map.addPolyline(polyOptions);
-            } else if (MainMap.mActiveBus != null) {
-                MainMap.mActiveBus.setBusInFocus();
-            }
-        }
+        showRoutePolyline();
         if(MainMap.mBusStop != null){
             if(MainMap.mBusStopMarker == null) {
                 MarkerOptions busStopOptions = new MarkerOptions()
@@ -406,10 +447,31 @@ public class Bus implements RoutingListener {
     }
     @Override
     public void onRoutingSuccess(ArrayList<Route> arrayList, int shortestRouteIndex) {
-       // showRouteOnMap(arrayList,shortestRouteIndex);
+       showTailingOnMap(arrayList,shortestRouteIndex);
     }
+
     @Override
     public void onRoutingCancelled() {
     }
 
+    private void showRoutePolyline(){
+        if(mRoute!=null) {
+            PolylineOptions polyOptions = new PolylineOptions();
+            polyOptions.color(mContext.getResources().getColor(R.color.blue));
+            polyOptions.width(10);
+            Log.d("KGPTracking", mRoute.toString());
+            polyOptions.addAll(mRoute);
+
+            if (MainMap.mActivePolyline != null) { // remove Current Active Polyline everytime before addin g new active Polyline
+                MainMap.mActivePolyline.remove();
+                MainMap.mActivePolyline = null;
+            }
+            if (this.equals(MainMap.mActiveBus)) {  // Check if Active Bus right now is equal to the original Bus Where this callback is called
+                MainMap.mActivePolyline = MainMap.m_map.addPolyline(polyOptions);
+            } else if (MainMap.mActiveBus != null) {
+                MainMap.mActiveBus.setBusInFocus();
+            }
+        }
+
+    }
 }

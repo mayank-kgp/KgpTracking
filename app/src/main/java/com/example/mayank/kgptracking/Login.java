@@ -152,7 +152,19 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
         mGoogleApiClient.clearDefaultAccountAndReconnect();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-    
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MyIntentService.isLoginForeground = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MyIntentService.isLoginForeground =false;
+    }
+
     private class LoginReceiver extends BroadcastReceiver{
 
         @Override
@@ -177,7 +189,7 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
                     }
                     Log.d("MyIntentService",data.getString(Constants.ACCESS_TOKEN));
                     Log.d("FromPreference",preferences.getString(Constants.ACCESS_TOKEN,"not there"));
-                    Log.d("FromPreference Time",preferences.getString(Constants.TOKEN_EXP,"not there exp"));
+                   // Log.d("FromPreference Time",preferences.getString(Constants.TOKEN_EXP,"not there exp"));
                     MyIntentService.startGetBusData(getApplicationContext());
                     MyIntentService.startGetTrackData(getApplicationContext());
                     Log.d("FromPreference",preferences.getString(Constants.ACCESS_TOKEN,"not there"));

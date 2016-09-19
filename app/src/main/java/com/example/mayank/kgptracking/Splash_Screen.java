@@ -48,89 +48,8 @@ public class Splash_Screen extends AppCompatActivity {
     protected void onResume() {
         gpscheck();
         Log.d("mayank123",""+gps);
-        if(gps) {
-            findViewById(R.id.loading).setVisibility(View.VISIBLE);
-            final boolean[] isConnected = {Util.checkConnection(Splash_Screen.this)};
-            if (isConnected[0]) {
-                Thread timerThread = new Thread() {
-                    public void run() {
-                        try {
-                            //ParseUser user= ParseUser.getCurrentUser();
-
-                            sleep(3000);
-
-
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } finally {
-
-
-                            SharedPreferences preferences = getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE);
-                            if (preferences.contains(Constants.isLogin) && preferences.getBoolean(Constants.isLogin, false)) {
-                                MyIntentService.startGetBusData(Splash_Screen.this);
-                                MyIntentService.startGetTrackData(Splash_Screen.this);
-                                IntentFilter filter = new IntentFilter();
-                                filter.addAction(MyIntentService.ACTION_GETBUSDATA);
-                                filter.addAction(MyIntentService.ACTION_GETTRACKDATA);
-                                LocalBroadcastManager.getInstance(Splash_Screen.this).
-                                        registerReceiver(mReceive, filter);
-                            } else {
-                                Intent i = new Intent(Splash_Screen.this, Login.class);
-                                startActivity(i);
-                                finish();
-                            }
-                        }
-
-                    }
-                };
-                timerThread.start();
-            } else {
-
-                RelativeLayout coordinatorLayout = (RelativeLayout) findViewById(R.id
-                        .coordinatorLayout);
-                Snackbar snackbar = Snackbar
-                        .make(coordinatorLayout, "No Network", Snackbar.LENGTH_INDEFINITE);
-
-
-                snackbar.show();
-
-                Thread timerThread = new Thread() {
-                    public void run() {
-                        try {
-                            //ParseUser user= ParseUser.getCurrentUser();
-                            while (isConnected[0] == false) {
-                                sleep(1000);
-                                if (Util.checkConnection(Splash_Screen.this) == true)
-                                    isConnected[0] = true;
-
-                            }
-
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } finally {
-
-
-                            SharedPreferences preferences = getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE);
-                            if (preferences.contains(Constants.isLogin) && preferences.getBoolean(Constants.isLogin, false)) {
-                                MyIntentService.startGetBusData(Splash_Screen.this);
-                                MyIntentService.startGetTrackData(Splash_Screen.this);
-                                IntentFilter filter = new IntentFilter();
-                                filter.addAction(MyIntentService.ACTION_GETBUSDATA);
-                                filter.addAction(MyIntentService.ACTION_GETTRACKDATA);
-                                LocalBroadcastManager.getInstance(Splash_Screen.this).
-                                        registerReceiver(mReceive, filter);
-                            } else {
-                                Intent i = new Intent(Splash_Screen.this, Login.class);
-                                startActivity(i);
-                                finish();
-                            }
-                        }
-                    }
-                };
-                timerThread.start();
-
-            }
-        }
+        if(gps) {afterGPSCheck();
+                   }
         super.onResume();
     }
 
@@ -160,8 +79,9 @@ public class Splash_Screen extends AppCompatActivity {
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        builder.show();
+                       // builder.show();
                         dialog.cancel();
+                        afterGPSCheck();
                     }
                 });
         final AlertDialog alert = builder.create();
@@ -180,20 +100,100 @@ public class Splash_Screen extends AppCompatActivity {
         switch (requestCode) {
             case 69: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-
-                } else {
-                    Toast.makeText(this,"App needs to access user location for better experience",Toast.LENGTH_LONG);
+                if (grantResults.length <= 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this,"App needs to access user location for better experience",Toast.LENGTH_LONG).show();
                     finish();
                 }
-                return;
+                //return;
             }
 
             // other 'case' lines to check for other
             // permissions this app might request
         }
     }
+
+    private void afterGPSCheck(){
+        findViewById(R.id.loading).setVisibility(View.VISIBLE);
+        final boolean[] isConnected = {Util.checkConnection(Splash_Screen.this)};
+        if (isConnected[0]) {
+            Thread timerThread = new Thread() {
+                public void run() {
+                    try {
+                        //ParseUser user= ParseUser.getCurrentUser();
+
+                        sleep(3000);
+
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+
+
+                        SharedPreferences preferences = getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE);
+                        if (preferences.contains(Constants.isLogin) && preferences.getBoolean(Constants.isLogin, false)) {
+                            MyIntentService.startGetBusData(Splash_Screen.this);
+                            MyIntentService.startGetTrackData(Splash_Screen.this);
+                            IntentFilter filter = new IntentFilter();
+                            filter.addAction(MyIntentService.ACTION_GETBUSDATA);
+                            filter.addAction(MyIntentService.ACTION_GETTRACKDATA);
+                            LocalBroadcastManager.getInstance(Splash_Screen.this).
+                                    registerReceiver(mReceive, filter);
+                        } else {
+                            Intent i = new Intent(Splash_Screen.this, Login.class);
+                            startActivity(i);
+                            finish();
+                        }
+                    }
+
+                }
+            };
+            timerThread.start();
+        } else {
+
+            RelativeLayout coordinatorLayout = (RelativeLayout) findViewById(R.id
+                    .coordinatorLayout);
+            Snackbar snackbar = Snackbar
+                    .make(coordinatorLayout, "No Network", Snackbar.LENGTH_INDEFINITE);
+
+
+            snackbar.show();
+
+            Thread timerThread = new Thread() {
+                public void run() {
+                    try {
+                        //ParseUser user= ParseUser.getCurrentUser();
+                        while (isConnected[0] == false) {
+                            sleep(1000);
+                            if (Util.checkConnection(Splash_Screen.this) == true)
+                                isConnected[0] = true;
+
+                        }
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+
+
+                        SharedPreferences preferences = getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE);
+                        if (preferences.contains(Constants.isLogin) && preferences.getBoolean(Constants.isLogin, false)) {
+                            MyIntentService.startGetBusData(Splash_Screen.this);
+                            MyIntentService.startGetTrackData(Splash_Screen.this);
+                            IntentFilter filter = new IntentFilter();
+                            filter.addAction(MyIntentService.ACTION_GETBUSDATA);
+                            filter.addAction(MyIntentService.ACTION_GETTRACKDATA);
+                            LocalBroadcastManager.getInstance(Splash_Screen.this).
+                                    registerReceiver(mReceive, filter);
+                        } else {
+                            Intent i = new Intent(Splash_Screen.this, Login.class);
+                            startActivity(i);
+                            finish();
+                        }
+                    }
+                }
+            };
+            timerThread.start();
+            }
+
+        }
 }
 //eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxMDM0NDQ0ODI4OTMyNzMwNjk2NjUiLCJlbWFpbCI6InNhaGlsdnMwMDBAZ21haWwuY29tIiwibmFtZSI6InNhaGlsIGNoYWRkaGEiLCJleHAiOjE0Nzk1NTk2NjYuNDM2OX0.DYn0Cu8Fe4fYizLBns_0owR0GEPo5n4xqSoEOyX7JpA

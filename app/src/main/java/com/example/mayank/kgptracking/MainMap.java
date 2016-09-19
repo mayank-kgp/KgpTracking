@@ -65,6 +65,7 @@ public class MainMap extends AppCompatActivity
     TextView may;
     public static int mBusCount = 0; // Sahil
     public static Polyline mActivePolyline = null; // Sahil
+    public static Polyline mActiveTailing = null;
     public static Bus mActiveBus = null; // Sahil
     public static GoogleMap m_map;
     public static LatLng mUserLocation = null;
@@ -127,7 +128,8 @@ public class MainMap extends AppCompatActivity
                         bus.getString(Constants.RESPONSE_BUSCODE),bus.getString(Constants.RESPONSE_BUSNUMBER),
                         bus.getString(Constants.RESPONSE_BUSNAME),
                         parseDouble (track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LAT)),
-                        parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LON))
+                        parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LON)),
+                        track.getJSONArray(Constants.RESPONSE_COORDINATES)
                 ));
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -279,7 +281,7 @@ public class MainMap extends AppCompatActivity
             Intent i = new Intent(this,Login.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
             MyIntentService.loop = false;
-            getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE).edit().clear().commit();
+            getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE).edit().clear().apply();
             startActivity(i);
             finish();
         }
@@ -357,7 +359,7 @@ public class MainMap extends AppCompatActivity
 //        m_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
             m_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             currentloc = CameraPosition.builder()
-                    .target(new LatLng(22.3216178, 87.3009507))
+                    .target(new LatLng(22.319680, 87.308604))
                    // .target(mUserLocation)
                     .zoom(17)
                     .bearing(70)
@@ -397,6 +399,10 @@ public class MainMap extends AppCompatActivity
             Log.d("mapreadyfunction", "calledhere");
              mBuses.get(i).setMarker(m_map.addMarker(mBuses.get(i).getMarkerOptions()));
              mBuses.get(i).setDirectionMarker(m_map.addMarker(mBuses.get(i).getDirectionOptions()));
+             for(int j = 0; j<mBuses.get(i).mTailingMarkersOptions.size();j++){
+                 mBuses.get(i).mTailingMarkers.add(m_map.addMarker(mBuses.get(i).mTailingMarkersOptions.get(j)));
+                 mBuses.get(i).mTailingMarkers.get(j).setVisible(false);
+             }
             Log.d("mayank123", "Bus code" + mBuses.get(i).getBusCode());
 
 
@@ -570,10 +576,11 @@ public class MainMap extends AppCompatActivity
     };
     @Override
     public void onDestroy(){
-        super.onDestroy();
+
         Log.d(Constants.LOG_TAG,"onDestroy");
         mBusCount = 0;
         mActivePolyline = null; // Sahil
+        mActiveTailing = null; // Sahil
         mActiveBus = null; // Sahil
         mUserLocation = null;
         mBuses = null;
@@ -581,7 +588,10 @@ public class MainMap extends AppCompatActivity
         mBusStop = null;
         mLoc = null; // user location got from Bus Stop
         mBusStopMarker = null;
+        MyIntentService.loop = false;
+        mapReady = false;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receive);
+        super.onDestroy();
     }
     private class Receiver extends BroadcastReceiver{
         @Override
@@ -597,11 +607,13 @@ public class MainMap extends AppCompatActivity
                                 if (mBuses.get(j).getBusCode().equals(track.getString(Constants.RESPONSE_BUSCODE))) {
                                     mBuses.get(i).setBusPosition(parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LAT)),
                                             parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_LON)),
-                                            parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_COG)));
+                                            parseDouble(track.getJSONArray(Constants.RESPONSE_COORDINATES).getJSONObject(0).getString(Constants.RESPONSE_COG)),
+                                            track.getJSONArray(Constants.RESPONSE_COORDINATES)
+                                    );
                                 }
                             }
                         }
-                        if(mActiveBus != null && mBusStop != null){
+                        if(mActiveBus != null){
                             //mActiveBus.findRouteFromPosition(mBusStop.latitude,mBusStop.longitude);
                             mActiveBus.showRouteOnMap();
                         }

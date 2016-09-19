@@ -10,7 +10,7 @@ public class Constants {
     public static final String RESPONSE_DATA = "data";
     public static final String API_BASEURL = "http://10.5.30.181/Tracking_api/index.php/";
     public static final String API_USERDATAURL = API_BASEURL+"Userdata/user";
-    public static final String API_TRACKURL = API_BASEURL+"Tracking/track?buscode=all";
+    public static final String API_TRACKURL = API_BASEURL+"Tracking/track?buscode=all&amt=6";
     public static final String API_BUSDATAURL= API_BASEURL+"Busdata/bus?buscode=all";
     public static final String API_BUSSTOPURL= API_BASEURL+"Service/busstop";
     public static final String RESPONSE_STATUS = "status";
