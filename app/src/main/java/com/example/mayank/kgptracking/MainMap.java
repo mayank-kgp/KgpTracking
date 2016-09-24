@@ -2,14 +2,17 @@ package com.example.mayank.kgptracking;
 // added mBusCount,mActiveBus and mActivePolyline : Sahil
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,8 +28,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,9 +50,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 
 import org.json.JSONArray;
@@ -54,6 +63,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static java.lang.Double.parseDouble;
 
@@ -98,6 +108,11 @@ public class MainMap extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //getIntent().getStringExtra()
+
+        Window window = this.getWindow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(Color.argb(255,0,110,66));
+        }
 
         mMarkersHashMap = new HashMap<Marker, MyMarker>();
         mMyMarkersArray = new ArrayList<MyMarker>();
@@ -224,6 +239,7 @@ public class MainMap extends AppCompatActivity
         IntentFilter filter = new IntentFilter(MyIntentService.ACTION_GETTRACKDATA);
         filter.addAction(MyIntentService.ACTION_GETBUSSTOP);
         LocalBroadcastManager.getInstance(this).registerReceiver(receive,filter);
+
     }
 
     protected synchronized void buildGoogleApiClient() {

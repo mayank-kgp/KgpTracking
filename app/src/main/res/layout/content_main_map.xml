@@ -36,127 +36,42 @@
                 map:cameraTargetLng="-73.9857"
                 map:cameraTilt="65"
                 map:cameraZoom="17"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="0dp"
                 tools:layout="@layout/content_main_map"
-                android:layout_weight="8" />
+                android:layout_weight="8"
+                />
 
 
 
-            <LinearLayout
-                android:orientation="vertical"
+            <!--<LinearLayout-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0dp"-->
+                <!--android:background="#fff"-->
+                <!--android:layout_weight="2">-->
+                <!---->
+                    <!--<LinearLayout-->
+                        <!--android:orientation="horizontal"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="match_parent"-->
+                        <!--android:id="@+id/horizontalLinear"-->
+                        <!--android:background="#d7ccc8">-->
+                        <!--&lt;!&ndash; Added ID to this linear layout : Sahil  &ndash;&gt;-->
+                        <!---->
+                    <!--</LinearLayout>-->
+                <!---->
+            <!--</LinearLayout>-->
+            <Button
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:background="#fff"
-                android:layout_weight="2">
-                <!--<TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Select Bus From Here"
-                    android:id="@+id/may"
-                    android:layout_weight="0.25"
-                    android:ellipsize="marquee"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:singleLine="true"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textSize="15dp"
-                    android:layout_marginBottom="5dp" />-->
-                <!--<HorizontalScrollView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="0dp"-->
-                    <!--android:id="@+id/horizontalScrollView"-->
-                    <!--android:layout_gravity="center_horizontal"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:layout_marginBottom="5dp"-->
-                    <!--android:scrollbars="none">-->
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/horizontalLinear"
-                        android:background="#d7ccc8">
-                        <!-- Added ID to this linear layout : Sahil  -->
-
-                        <!--<Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="BUS2"
-                            android:id="@+id/bus2"
-
-                            android:background="#ffffff"
-                            android:layout_marginRight="1dp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="BUS3"
-                            android:id="@+id/bus3"
-                            android:background="#ffffff"
-                            android:layout_marginRight="1dp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="BUS4"
-                            android:id="@+id/bus4"
-                            android:background="#ffffff"
-                            android:layout_marginRight="1dp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="BUS5"
-                            android:id="@+id/bus5"
-                            android:background="#ffffff"
-                            android:layout_marginRight="1dp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="BUS6"
-                            android:id="@+id/bus6"
-                            android:background="#ffffff"
-                            android:layout_marginRight="1dp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="BUS7"
-                            android:id="@+id/bus7"
-                            android:background="#ffffff"
-                            android:layout_marginRight="1dp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="BUS8"
-                            android:id="@+id/bus8"
-                            android:background="#ffffff"
-                            android:layout_marginRight="1dp" />-->
-                    </LinearLayout>
-                <!--</HorizontalScrollView>-->
-                <!--<TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Current Bus : Bus 1"
-                    android:id="@+id/currentbus"
-                    android:layout_weight="0.25"
-                    android:ellipsize="marquee"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:singleLine="true"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textSize="15dp" />-->
-
-
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:id="@+id/button"
+                android:layout_marginTop="0dp"
+                ></Button>
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:prompt="mayank"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

@@ -177,7 +177,7 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
                     }
                     Log.d("MyIntentService",data.getString(Constants.ACCESS_TOKEN));
                     Log.d("FromPreference",preferences.getString(Constants.ACCESS_TOKEN,"not there"));
-                    Log.d("FromPreference Time",preferences.getString(Constants.TOKEN_EXP,"not there exp"));
+                    Log.d("FromPreference Time",""+preferences.getFloat(Constants.TOKEN_EXP,(float)1.0));
                     MyIntentService.startGetBusData(getApplicationContext());
                     MyIntentService.startGetTrackData(getApplicationContext());
                     Log.d("FromPreference",preferences.getString(Constants.ACCESS_TOKEN,"not there"));

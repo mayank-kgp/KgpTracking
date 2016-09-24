@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:background="@color/blue"
+    android:background="@color/test"
     android:id="@+id/coordinatorLayout"
     >
 
@@ -12,7 +12,8 @@
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:id="@+id/imageView2"
-        android:src="@drawable/bus"
+        android:src="@drawable/icon_bus"
+        android:tint="#040048"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="76dp" />
@@ -27,7 +28,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="83dp"
         android:isScrollContainer="true"
-        android:textColor="#fff"
+        android:textColor="#001240"
         android:textSize="30sp"
         android:textStyle="bold"
         android:fontFamily="san-serif-thin" />
@@ -38,7 +39,7 @@
         android:id="@+id/loading"
         android:visibility="visible"
         app:indicator="BallPulse"
-        app:indicator_color="#ffffff"
+        app:indicator_color="#fff200"
         android:layout_gravity="center_horizontal"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"

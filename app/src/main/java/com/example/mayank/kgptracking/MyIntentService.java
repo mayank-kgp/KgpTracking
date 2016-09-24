@@ -30,7 +30,7 @@ public class MyIntentService extends IntentService {
     private static boolean isTokenExpired(Context context){
         SharedPreferences preferences = context.getSharedPreferences(Constants.LOGIN_FILE,Context.MODE_PRIVATE);
         float exp_time = preferences.getFloat(Constants.TOKEN_EXP, (float) 1.0);
-        if(System.currentTimeMillis()*1000 > exp_time){
+        if(System.currentTimeMillis() > exp_time*1000){
             Log.d("MyIntentService","Token Expired" + System.currentTimeMillis()*1000 + "  " + exp_time );
             Intent i = new Intent(context,Login.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);

@@ -88,8 +88,8 @@ public class Bus implements RoutingListener {
         }
         //LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rootView = ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
-        //View rootView = super.findViewById(android.R.id.content);
-        LinearLayout lv = (LinearLayout) rootView.findViewById(R.id.horizontalLinear);
+//        //View rootView = super.findViewById(android.R.id.content);
+//        LinearLayout lv = (LinearLayout) rootView.findViewById(R.id.horizontalLinear);
        // HorizontalScrollView hv = (HorizontalScrollView) rootView.findViewById(R.id.horizontalScrollView);
 
 //        LinearLayout busview = new LinearLayout(context);
@@ -102,11 +102,11 @@ public class Bus implements RoutingListener {
 //                LinearLayout.LayoutParams.WRAP_CONTENT);
 //        busnumbertext.setLayoutParams(param1);
 
-        Button bv = new Button(context);
+        Button bv = (Button) rootView.findViewById(R.id.button);
         //Button bv1 = new Button(context);
         bv.setText(mBusName);
-      //  bv1.setText("mayank");
-       // String bus_id = "Bus_"+(mBusCount+1);
+        //bv1.setText("mayank");
+//        String bus_id = "Bus_"+(mBusCount+1);
         bv.setId(MainMap.mBusCount);
         bv.setBackgroundColor(Color.WHITE);
         bv.setBackground(getAdaptiveRippleDrawable(R.color.black_overlay,R.color.blue));
@@ -117,31 +117,31 @@ public class Bus implements RoutingListener {
 //        busview.addView(busnumbertext);
 //
 //        lv.addView(busview);
-        lv.addView(bv);
+        //lv.addView(bv);
     //   hv.setVisibility(View.INVISIBLE);
      //   lv.setMinimumWidth(200);
       //  lv.setWeightSum(1.0f);
 
        // lv.setWeightSum(lv.getChildCount()+1);
-        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT,1);
-        for (int i=0; i < lv.getChildCount(); i++){
-
-            Log.d("mayank2","i"+i);
-            View v = lv.getChildAt(i);
-//            LinearLayout.LayoutParams loparams = (LinearLayout.LayoutParams)  v.getLayoutParams();
+//        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                LinearLayout.LayoutParams.MATCH_PARENT,1);
+//        for (int i=0; i < lv.getChildCount(); i++){
 //
-//            // Set only target params:
-//            loparams.height = 0;
-         //   param.width = lv.getWidth();
-           // param.weight = 1;
-         //   param.width = 0;
-            v.setLayoutParams(param);
-            v.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.ripple,null));
-           //Log.d("mayank2",""+v.getWidth());
-        //    Log.d("mayank2",""+lv.getWeightSum());
-        }
+//            Log.d("mayank2","i"+i);
+//            View v = lv.getChildAt(i);
+////            LinearLayout.LayoutParams loparams = (LinearLayout.LayoutParams)  v.getLayoutParams();
+////
+////            // Set only target params:
+////            loparams.height = 0;
+//         //   param.width = lv.getWidth();
+//           // param.weight = 1;
+//         //   param.width = 0;
+//            v.setLayoutParams(param);
+//            v.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.ripple,null));
+//           //Log.d("mayank2",""+v.getWidth());
+//        //    Log.d("mayank2",""+lv.getWeightSum());
+//        }
         //((Activity)context
 //        ((Activity)context).setContentView(rootView);
         mBusButton = bv;
@@ -258,7 +258,7 @@ public class Bus implements RoutingListener {
             returnaldi bhrne se kya lena dena tuhe null;
         }*/
         /*else*/{
-            mBusButton.setBackgroundColor(Color.BLUE);
+            mBusButton.setBackgroundColor(Color.argb(255,0,110,66));
             mBusButton.setTextColor(Color.WHITE);
             CameraPosition newPosition = new CameraPosition.Builder()
                     .target(mLocation)
@@ -411,5 +411,6 @@ public class Bus implements RoutingListener {
     @Override
     public void onRoutingCancelled() {
     }
+
 
 }
