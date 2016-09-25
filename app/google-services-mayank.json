@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "470658213591",
+    "project_id": "kgptracking-5f79e"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470658213591:android:6985e19a8e5e774d",
+        "android_client_info": {
+          "package_name": "com.example.mayank.kgptracking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "470658213591-2gcuoo2oqn82f5u890oraus2cavg75qj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mayank.kgptracking",
+            "certificate_hash": "E84BA7052FC439DDF219933507286272257A40E2"
+          }
+        },
+        {
+          "client_id": "470658213591-sppthrubkgu7k9c5mvlu2e6c7a98s8i1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYFDRNz4IWLdShpUBcif_vgWfqCHBtVys"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
