@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="black_overlay">#66000000</color>
-    <color name="blue">#0066cc</color>
+    <color name="blue">#03b255</color>
     <color name="gold">#e6b121</color>
+    <color name="test">#00b16a</color>
 </resources>

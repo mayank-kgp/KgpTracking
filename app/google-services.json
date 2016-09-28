@@ -17,7 +17,8 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.mayank.kgptracking",
-            "certificate_hash": "E84BA7052FC439DDF219933507286272257A40E2"
+        //    "certificate_hash": "E84BA7052FC439DDF219933507286272257A40E2"
+            "certificate_hash": " C04B46EEE1B88EF8D99A93D785A72065B6D46409"
           }
         },
         {

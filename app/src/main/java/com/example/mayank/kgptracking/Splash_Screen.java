@@ -8,7 +8,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -18,6 +20,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -42,6 +45,10 @@ public class Splash_Screen extends AppCompatActivity {
 //            actionBar.hide();
 //        }
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        Window window = this.getWindow();
+               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                       window.setStatusBarColor(Color.argb(255,0,110,66));
+                   }
     }
 
     @Override

@@ -155,22 +155,22 @@ public class Bus implements RoutingListener {
         LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT,1);
-        for (int i=0; i < lv.getChildCount(); i++){
-
-            Log.d("mayank2","i"+i);
-            View v = lv.getChildAt(i);
-//            LinearLayout.LayoutParams loparams = (LinearLayout.LayoutParams)  v.getLayoutParams();
+//        for (int i=0; i < lv.getChildCount(); i++){
 //
-//            // Set only target params:
-//            loparams.height = 0;
-         //   param.width = lv.getWidth();
-           // param.weight = 1;
-         //   param.width = 0;
-            v.setLayoutParams(param);
-            v.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.ripple,null));
-           //Log.d("mayank2",""+v.getWidth());
-        //    Log.d("mayank2",""+lv.getWeightSum());
-        }
+//            Log.d("mayank2","i"+i);
+//            View v = lv.getChildAt(i);
+////            LinearLayout.LayoutParams loparams = (LinearLayout.LayoutParams)  v.getLayoutParams();
+////
+////            // Set only target params:
+////            loparams.height = 0;
+//         //   param.width = lv.getWidth();
+//           // param.weight = 1;
+//         //   param.width = 0;
+//            v.setLayoutParams(param);
+//            v.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.ripple,null));
+//           //Log.d("mayank2",""+v.getWidth());
+//        //    Log.d("mayank2",""+lv.getWeightSum());
+//        }
         //((Activity)context
 //        ((Activity)context).setContentView(rootView);
         mBusButton = bv;
@@ -286,15 +286,15 @@ public class Bus implements RoutingListener {
         mCOG = cog;
         mDirectionMarker.setPosition(mLocation);
         mDirectionMarker.setRotation((float) cog);
-        for (int i = 1; i < tailings.length(); i++) {
-            try {
-                mTailingMarkers.get(i-1).setPosition(new LatLng(parseDouble(tailings.getJSONObject(i).getString(Constants.RESPONSE_LAT)),
-                        parseDouble(tailings.getJSONObject(i).getString(Constants.RESPONSE_LON))));
-                mTailingMarkers.get(i-1).setRotation((float) parseDouble(tailings.getJSONObject(i).getString(Constants.RESPONSE_COG)));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+//        for (int i = 1; i < tailings.length(); i++) {
+//            try {
+//                mTailingMarkers.get(i-1).setPosition(new LatLng(parseDouble(tailings.getJSONObject(i).getString(Constants.RESPONSE_LAT)),
+//                        parseDouble(tailings.getJSONObject(i).getString(Constants.RESPONSE_LON))));
+//                mTailingMarkers.get(i-1).setRotation((float) parseDouble(tailings.getJSONObject(i).getString(Constants.RESPONSE_COG)));
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
     public String getBusCode(){
         return mBusCode;

@@ -23,6 +23,10 @@
             android:icon="@drawable/ic_menu_manage"
             android:title="Settings" />
         <item
+            android:id="@+id/monitor"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Monitor" />
+        <item
             android:id="@+id/action_logout"
             android:orderInCategory="100"
             android:title="Logout"

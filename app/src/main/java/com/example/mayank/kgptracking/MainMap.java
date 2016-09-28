@@ -8,8 +8,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,8 +27,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +60,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static java.lang.Double.parseDouble;
 
@@ -99,7 +106,10 @@ public class MainMap extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //getIntent().getStringExtra()
-
+        Window window = this.getWindow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(Color.argb(255,0,110,66));
+        }
         mMarkersHashMap = new HashMap<Marker, MyMarker>();
         mMyMarkersArray = new ArrayList<MyMarker>();
 
@@ -136,6 +146,46 @@ public class MainMap extends AppCompatActivity
             }
 
         }
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        //spinner.setOnItemSelectedListener(MainMap.this);
+        List<String> buses = new ArrayList<String>();
+        for(int i=0;i<mBuses.size();i++){
+            buses.add(mBuses.get(i).getmBusName());
+        }
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, buses);
+
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("mayankqwer","mayankqwer");
+               /* Test test = new Test();
+                test.execute();*/
+               // Log.d("mayankqwer5","mayankqwer5");
+                if (mActiveBus == null)
+                    mBuses.get(position).setBusInFocus();
+                else if (mActiveBus.equals(mBuses.get(position))) {
+                    Log.d("mayankqwer6","mayankqwer6");
+                    mActiveBus.setBusOutFocus();
+                }
+                else {
+                    Log.d("mayankqwer7","mayankqwer7");
+                    mActiveBus.setBusOutFocus();
+                    mBuses.get(position).setBusInFocus();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                Log.d("mayankqwer1","mayankqwer1");
+            }
+        });
+
 //        may = (TextView) findViewById(R.id.may);
 //        may.setSelected(true);
 
@@ -275,6 +325,9 @@ public class MainMap extends AppCompatActivity
         if(id == R.id.action_logout){
             getSharedPreferences(Constants.LOGIN_FILE, Context.MODE_PRIVATE).edit().clear().apply();
         }
+        if(id == R.id.action_logout){
+            show_all_buses();
+        }
 
         if (id == R.id.action_logout) {
 
@@ -300,6 +353,10 @@ public class MainMap extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void show_all_buses() {
+        
     }
 
     @Override
@@ -593,6 +650,8 @@ public class MainMap extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receive);
         super.onDestroy();
     }
+
+
     private class Receiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
